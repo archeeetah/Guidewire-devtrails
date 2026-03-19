@@ -1,0 +1,13 @@
+# Use Case Document
+DEVTrails_2026_Usecase_Document.pdf
+
+# OS/IDE Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs & Temp
+*.log
+npm-debug.log*
+.tmp/
