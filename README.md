@@ -1,4 +1,5 @@
-# ShramShield: AI-Powered Parametric Income Protection for Gig Workers
+# ShramShield: AI-Powered Insurance PLATFORM for India’s Gig Economy
+
 
 **Project for Guidewire DEVTrails 2026 Hackathon**
 
