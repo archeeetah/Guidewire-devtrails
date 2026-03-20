@@ -39,7 +39,7 @@ export default function Home() {
     <main className="min-h-screen bg-white text-brand-slate selection:bg-brand-yellow selection:text-brand-dark">
       <Navbar />
       
-      <div className="pt-20">
+      <div>
         <Hero />
         
         <section id="platforms" className="container mx-auto px-4 py-24 border-t border-slate-100">
