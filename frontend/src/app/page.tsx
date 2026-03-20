@@ -75,9 +75,7 @@ export default function Home() {
         platform={selectedPersona || ""}
       />
 
-      <footer className="border-t border-slate-100 py-12 text-center text-slate-400 text-sm font-medium">
-        <p>© 2026 SafeZone. Built for Guidewire DEVTrails Hackathon.</p>
-      </footer>
+
     </main>
   );
 }
