@@ -10,7 +10,7 @@ export default function Navbar() {
           <div className="w-10 h-10 bg-brand-yellow rounded-xl flex items-center justify-center shadow-lg shadow-brand-yellow/10">
             <ShieldCheck className="text-black w-6 h-6" />
           </div>
-          <span className="text-2xl font-black tracking-tighter uppercase text-brand-slate">SafeZone</span>
+          <span className="text-2xl font-black tracking-tighter uppercase text-brand-slate">ShramShield</span>
         </div>
         
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-500">

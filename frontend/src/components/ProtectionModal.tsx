@@ -39,7 +39,7 @@ export default function ProtectionModal({ isOpen, onClose, platform }: Protectio
                 </div>
                 <div>
                   <h2 className="text-2xl font-black text-brand-slate tracking-tight">Active Protection</h2>
-                  <p className="text-slate-500 font-medium text-sm">Powered by SafeZone AI</p>
+                  <p className="text-slate-500 font-medium text-sm">Powered by ShramShield AI</p>
                 </div>
               </div>
               <button 

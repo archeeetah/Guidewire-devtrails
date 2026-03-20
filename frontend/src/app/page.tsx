@@ -51,7 +51,7 @@ export default function Home() {
           >
             <h2 className="text-4xl font-black mb-4 text-brand-slate tracking-tighter">Choose Your Platform</h2>
             <p className="text-slate-500 text-lg max-w-2xl mx-auto font-medium">
-              Select your delivery segment to see how SafeZone protects your weekly income
+              Select your delivery segment to see how ShramShield protects your weekly income
               from local disruptions.
             </p>
           </motion.div>

@@ -23,7 +23,7 @@ export default function Hero() {
           </h1>
           
           <p className="text-xl text-slate-600 mb-10 leading-relaxed font-medium">
-            SafeZone provides an instant financial safety net for India's gig workers. 
+            ShramShield provides an instant financial safety net for India's gig workers. 
             Automated payouts triggered by weather and city disruptions. 
           </p>
 

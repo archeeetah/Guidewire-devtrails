@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SafeZone | AI-Powered Gig Income Protection",
+  title: "ShramShield | AI-Powered Gig Income Protection",
   description: "Automated parametric insurance for India's delivery partners.",
 };
 
