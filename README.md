@@ -26,6 +26,21 @@ Existing insurance solutions are **reactive, slow, and not aligned with daily wa
 
 ShramShield AI addresses this gap through **predictive, automated parametric income protection.**
 
+# 🌐 Why Progressive Web App (PWA)?  
+
+We selected a **PWA architecture** to maximise accessibility for gig workers.
+
+### Benefits  
+
+- Works on low-storage smartphones  
+- Offline-first capability  
+- No app store dependency  
+- Faster onboarding and updates  
+- Cross-platform compatibility  
+- Reduced data consumption  
+
+This ensures **scalable adoption across diverse worker segments.**
+
 ## 2. The Weekly Premium Model
 Gig workers operate on a week-to-week earning cycle. ShramShield aligns with this reality by structuring all policies on a **Weekly basis**.
 - **Base Premium**: A low-cost entry fee (e.g., ₹20/week).
