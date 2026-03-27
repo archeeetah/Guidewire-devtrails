@@ -22,7 +22,9 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
         name=user.name,
         phone_number=user.phone_number,
         platform=user.platform,
-        primary_zone=user.primary_zone
+        platform_worker_id=user.platform_worker_id,
+        primary_zone=user.primary_zone,
+        upi_id=user.upi_id
     )
     db.add(new_user)
     db.commit()

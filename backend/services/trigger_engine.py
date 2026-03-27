@@ -9,7 +9,7 @@ def evaluate_disrupted_zones(db: Session, zone: str) -> List[dict]:
     Checks external conditions for a zone and evaluates if currently active policies 
     should automatically payout due to thresholds being crossed.
     """
-    telemetry = DisruptionAPIClient.fetch_current_mock_telemetry(zone)
+    telemetry = DisruptionAPIClient.fetch_current_telemetry(zone)
     payout_events = []
 
     # Simple Trigger Rules for MVP
