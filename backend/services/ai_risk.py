@@ -12,11 +12,13 @@ def calculate_risk_premium(platform: str, zone: str) -> dict:
     risk_factors = []
     recommended_triggers = []
 
+    zone_lower = zone.lower()
+
     # Platform specific mock risk logic
     if platform.lower() in ["zomato", "swiggy"]:
         # Food delivery: High sensitivity to Rain and Heat
         recommended_triggers.extend(["Rainfall Displacement", "Extreme Heat"])
-        if zone.lower() in ["andheri", "koramangala"]: # Mock flood-prone zones
+        if any(k in zone_lower for k in ["andheri", "koramangala", "mumbai", "chennai"]): # Mock flood-prone zones
             risk_adjustment += 25.0
             risk_factors.append("High Flood Risk Zone (+₹25)")
         else:
@@ -27,7 +29,7 @@ def calculate_risk_premium(platform: str, zone: str) -> dict:
         # Logistics: High sensitivity to Social Disruption and Lockouts
         recommended_triggers.append("Area Lockout / Curfew")
         base_premium = 199.0 # Logistics base might be slightly higher due to larger loads
-        if zone.lower() in ["dharavi", "seelampur"]:
+        if any(k in zone_lower for k in ["dharavi", "seelampur", "kashmir", "lockout"]):
             risk_adjustment += 30.0
             risk_factors.append("High Social Disruption Probability (+₹30)")
     
@@ -35,8 +37,7 @@ def calculate_risk_premium(platform: str, zone: str) -> dict:
         # Q-Commerce: High sensitivity to AQI and localized blockages
         recommended_triggers.extend(["AQI > 300", "Traffic Gridlock"])
         base_premium = 129.0
-        # Mock specific AQI rule based on reading
-        if zone.lower() == "delhi-ncr":
+        if any(k in zone_lower for k in ["delhi", "ncr", "gurgaon"]):
              risk_adjustment += 40.0
              risk_factors.append("Severe AQI Forecast Volatility (+₹40)")
 

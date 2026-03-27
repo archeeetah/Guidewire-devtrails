@@ -20,9 +20,11 @@ export default function Navbar() {
         </div>
 
         <div>
-          <button className="px-5 py-2.5 rounded-full bg-brand-slate text-white font-bold text-sm hover:bg-brand-yellow hover:text-brand-dark transition-all">
-            Login
-          </button>
+          <a href="/login">
+            <button className="px-5 py-2.5 rounded-full bg-brand-slate text-white font-bold text-sm hover:bg-brand-yellow hover:text-brand-dark transition-all shadow-md">
+              Login
+            </button>
+          </a>
         </div>
       </div>
     </nav>

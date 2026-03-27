@@ -24,13 +24,14 @@ class DisruptionAPIClient:
         }
 
         # Deterministic mocks for specific zones to make the hackathon demo easy
-        if zone.lower() == "delhi-ncr":
+        zone_lower = zone.lower()
+        if any(k in zone_lower for k in ["delhi", "ncr", "gurgaon"]):
             telemetry["aqi"] = random.randint(310, 450) # Severe AQI
         
-        if zone.lower() == "andheri":
+        if any(k in zone_lower for k in ["andheri", "mumbai", "chennai", "rain"]):
             telemetry["rainfall_mm_3h"] = random.uniform(40, 80) # Flash flood
 
-        if zone.lower() == "dharavi":
+        if any(k in zone_lower for k in ["dharavi", "lockout", "curfew", "tension"]):
             telemetry["zone_lockout"] = True # Simulated curfew
 
         return telemetry
