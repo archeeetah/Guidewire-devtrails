@@ -1,7 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ShieldCheck, Zap, CloudRain, AlertCircle, Wind } from "lucide-react";
+import { X, ShieldCheck, Zap, CloudRain, AlertCircle, Wind, Loader2 } from "lucide-react";
 
 interface ProtectionModalProps {
   isOpen: boolean;
@@ -10,6 +11,37 @@ interface ProtectionModalProps {
 }
 
 export default function ProtectionModal({ isOpen, onClose, platform }: ProtectionModalProps) {
+  const [quote, setQuote] = useState<{ final_weekly_premium: number; base_premium: number; risk_adjustment: number } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Mocking the zone for the demo. In a real app, this would come from GPS/User Profile.
+  const primaryZone = platform.includes("Amazon") ? "Dharavi" : platform.includes("Zomato") ? "Andheri" : "Delhi-NCR";
+  
+  useEffect(() => {
+    if (isOpen && platform) {
+      setIsLoading(true);
+      fetch("http://localhost:8000/api/policies/quote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          platform: platform.split(" /")[0], 
+          primary_zone: primaryZone 
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        setQuote(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to fetch quote", err);
+        setIsLoading(false);
+      });
+    } else {
+      setQuote(null);
+    }
+  }, [isOpen, platform, primaryZone]);
+
   const isZomato = platform === "Zomato / Swiggy";
   const isAmazon = platform === "Amazon / Flipkart";
 
@@ -52,12 +84,30 @@ export default function ProtectionModal({ isOpen, onClose, platform }: Protectio
 
             {/* Content */}
             <div className="p-8">
-              <div className="mb-8 p-6 rounded-2xl bg-brand-yellow/10 border border-brand-yellow/20">
-                <p className="text-brand-slate font-bold mb-1 opacity-70">Weekly Premium</p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black text-brand-slate">₹{isZomato ? "149" : isAmazon ? "199" : "129"}</span>
-                  <span className="text-slate-500 font-bold">/week</span>
-                </div>
+              <div className="mb-8 p-6 rounded-2xl bg-brand-yellow/10 border border-brand-yellow/20 relative">
+                <p className="text-brand-slate font-bold mb-1 opacity-70">AI Adjusted Weekly Premium</p>
+                
+                {isLoading ? (
+                  <div className="flex items-center gap-2 text-slate-500 py-2">
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                    <span className="font-medium font-mono text-sm">Calculating Risk...</span>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-4xl font-black text-brand-slate">
+                        ₹{quote ? quote.final_weekly_premium : "--"}
+                      </span>
+                      <span className="text-slate-500 font-bold">/week</span>
+                    </div>
+                    {quote && quote.risk_adjustment !== 0 && (
+                      <p className={`text-sm font-bold mt-2 ${quote.risk_adjustment > 0 ? 'text-red-500' : 'text-green-600'}`}>
+                        {quote.risk_adjustment > 0 ? "+" : ""}
+                        ₹{quote.risk_adjustment} Risk Adjustment for {primaryZone}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               <h3 className="text-lg font-black text-brand-slate mb-4">Parametric Triggers</h3>
@@ -99,10 +149,10 @@ export default function ProtectionModal({ isOpen, onClose, platform }: Protectio
             <div className="p-8 pt-0">
               <button className="w-full py-4 bg-brand-yellow text-brand-dark font-black rounded-2xl hover:bg-black hover:text-white transition-all shadow-xl shadow-brand-yellow/20 flex items-center justify-center gap-2">
                 <Zap className="w-5 h-5" />
-                Activate Protection
+                Activate Protection (₹{quote ? quote.final_weekly_premium : "--"})
               </button>
               <p className="text-center mt-4 text-xs text-slate-400 font-medium">
-                Prowered by Guidewire Underwriting API (Simulation)
+                Powered by Guidewire Underwriting API (Simulation)
               </p>
             </div>
           </motion.div>

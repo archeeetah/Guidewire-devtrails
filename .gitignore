@@ -29,3 +29,28 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Python / FastAPI Backend
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Database Files
+*.sqlite3
+*.db
+shramshield.db
+
+# Testing / Tooling
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
