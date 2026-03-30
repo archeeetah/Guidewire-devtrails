@@ -51,15 +51,15 @@ export default function DashboardPage() {
       <div className="container mx-auto px-4 py-12 flex-grow flex flex-col items-center">
         
         <div className="text-center mb-12">
-          <div className="inline-flex items-center px-3 py-1 mb-6 rounded-full bg-red-500/10 border border-red-500/20 text-red-600 font-black text-sm uppercase tracking-widest">
+          <div className="inline-flex items-center px-3 py-1 mb-6 rounded-full bg-brand-slate text-white font-black text-xs uppercase tracking-widest">
             <Zap className="w-4 h-4 mr-2" />
-            Hackathon God Mode
+            System Administration
           </div>
           <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-4 text-brand-slate">
-            Disruption Simulator
+            Emergency Command Center
           </h1>
           <p className="text-slate-500 font-medium">
-            Trigger a real-world disaster in a specific zone to watch ShramShield's parametric engine automatically save the day.
+            Monitor and manage disruption events across active zones to ensure ShramShield's parametric engine provides instant protection.
           </p>
         </div>
 

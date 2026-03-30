@@ -1,0 +1,25 @@
+{
+  "name": "ShramShield | AI Gig Income Protection",
+  "short_name": "ShramShield",
+  "description": "Automated parametric insurance for India's gig workers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e293b",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "orientation": "portrait",
+  "categories": ["finance", "insurance", "productivity"]
+}

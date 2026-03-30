@@ -36,7 +36,6 @@ export default function OnboardingWizard() {
       setTimeout(() => {
         setIsScanning(false);
         setHasScanned(true);
-        updateForm("platform_worker_id", "VFY-" + Math.floor(1000 + Math.random() * 9000));
       }, 2500);
     }
   };
@@ -104,8 +103,7 @@ export default function OnboardingWizard() {
       setStep(7);
     } catch (err) {
       console.error("Registration failed", err);
-      // Fallback for hackathon demo
-      setStep(7);
+      // Removed fallback for production ready logic
     }
     setIsSubmitting(false);
   };
@@ -307,8 +305,8 @@ export default function OnboardingWizard() {
           {step === 4 && (
             <motion.div key="step4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ willChange: "opacity" }} className="flex flex-col items-center justify-center py-20 text-center">
                <Loader2 className="w-16 h-16 text-brand-yellow animate-spin mb-6 mx-auto" />
-               <h2 className="text-2xl font-black text-brand-slate mb-2">Partner API Verification</h2>
-               <p className="text-slate-500 font-bold max-w-xs mx-auto">Contacting {formData.platform || "Platform"} HR Servers to verify active employment tag: <span className="text-brand-slate uppercase">{formData.platform_worker_id}</span></p>
+               <h2 className="text-2xl font-black text-brand-slate mb-2">Credential Verification</h2>
+               <p className="text-slate-500 font-bold max-w-xs mx-auto">Authorizing employment credentials for worker ID: <span className="text-brand-slate uppercase">{formData.platform_worker_id}</span></p>
             </motion.div>
           )}
 

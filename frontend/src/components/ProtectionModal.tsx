@@ -165,13 +165,10 @@ export default function ProtectionModal({ isOpen, onClose, platform }: Protectio
 
             {/* CTA - sticky bottom on mobile */}
             <div className="p-5 sm:p-8 pt-2 sm:pt-0 sticky bottom-0 bg-white pb-[max(1.25rem,var(--safe-bottom))]">
-              <button className="w-full py-3.5 sm:py-4 bg-brand-yellow text-brand-dark font-black rounded-xl sm:rounded-2xl hover:bg-black hover:text-white transition-all shadow-xl shadow-brand-yellow/20 flex items-center justify-center gap-2 active:scale-[0.97] text-sm sm:text-base">
+              <button className="w-full py-4 bg-brand-yellow text-brand-dark font-black rounded-2xl hover:bg-black hover:text-white transition-all shadow-xl shadow-brand-yellow/20 flex items-center justify-center gap-2 active:scale-[0.97] text-sm sm:text-base">
                 <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
                 Activate Protection (₹{quote ? quote.final_weekly_premium : "--"})
               </button>
-              <p className="text-center mt-3 sm:mt-4 text-[10px] sm:text-xs text-slate-400 font-medium">
-                Powered by Guidewire Underwriting API (Simulation)
-              </p>
             </div>
           </motion.div>
         </div>
