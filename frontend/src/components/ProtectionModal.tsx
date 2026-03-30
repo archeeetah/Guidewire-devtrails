@@ -36,7 +36,7 @@ export default function ProtectionModal({ isOpen, onClose, platform }: Protectio
   useEffect(() => {
     if (isOpen && platform) {
       setIsLoading(true);
-      fetch("http://localhost:8000/api/policies/quote", {
+      fetch("http://127.0.0.1:8000/api/policies/quote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 

@@ -16,10 +16,13 @@ export default function OnboardingWizard() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successData, setSuccessData] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+  const API_URL = "http://127.0.0.1:8000";
   const [platformSearch, setPlatformSearch] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [hasScanned, setHasScanned] = useState(false);
+  const [isDetecting, setIsDetecting] = useState(false);
 
   const gigCompanies = ["Zomato", "Swiggy", "Blinkit", "Zepto", "Amazon", "Flipkart", "Uber", "Ola", "Rapido", "Porter", "Dunzo", "Shadowfax", "UrbanCompany"];
   const filteredCompanies = gigCompanies.filter(c => c.toLowerCase().includes(platformSearch.toLowerCase()));
@@ -76,19 +79,22 @@ export default function OnboardingWizard() {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    setError(null);
     try {
       // 1. Register User
-      const userRes = await fetch("http://localhost:8000/api/users/register", {
+      const userRes = await fetch(`${API_URL}/api/users/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
       });
       
+      if (!userRes.ok) throw new Error("Verification Failed");
+      
       const userData = await userRes.json();
       localStorage.setItem("worker_phone", formData.phone_number);
       
       // 2. Fetch Initial Quote
-      const quoteRes = await fetch("http://localhost:8000/api/policies/quote", {
+      const quoteRes = await fetch(`${API_URL}/api/policies/quote`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -97,13 +103,15 @@ export default function OnboardingWizard() {
         })
       });
 
+      if (!quoteRes.ok) throw new Error("Risk Profile Generation Failed");
+
       const quoteData = await quoteRes.json();
       
       setSuccessData({ user: userData, quote: quoteData });
       setStep(7);
     } catch (err) {
       console.error("Registration failed", err);
-      // Removed fallback for production ready logic
+      setError("Network Outage: Backend unreachable at 127.0.0.1:8000");
     }
     setIsSubmitting(false);
   };
@@ -115,15 +123,15 @@ export default function OnboardingWizard() {
   ];
 
   return (
-    <div className="w-full max-w-xl mx-auto bg-white rounded-2xl sm:rounded-[32px] shadow-2xl overflow-hidden border border-slate-100 p-5 sm:p-8 min-h-[400px] flex flex-col">
+    <div className="w-full max-w-xl mx-auto bg-white/90 backdrop-blur-xl rounded-[40px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1),0_0_20px_rgba(250,204,21,0.05)] overflow-y-auto border border-slate-100 p-6 sm:p-12 max-h-[85vh] sm:min-h-[550px] flex flex-col relative overscroll-contain">
       
-      {/* Progress Bar */}
+      {/* Progress Bar with Glow */}
       {step < 7 && (
-        <div className="w-full h-2 bg-slate-100 mt-8 rounded-full overflow-hidden">
+        <div className="w-full h-1.5 bg-slate-100/50 mt-4 rounded-full overflow-hidden shrink-0 relative">
           <motion.div 
-            className="h-full bg-brand-yellow"
+            className="h-full bg-brand-yellow shadow-[0_0_15px_rgba(250,204,21,0.6)]"
             animate={{ width: `${(step / 7) * 100}%` }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           />
         </div>
       )}
@@ -137,25 +145,26 @@ export default function OnboardingWizard() {
               <h2 className="text-2xl sm:text-3xl font-black text-brand-slate mb-2">Enter your number</h2>
               <p className="text-slate-500 mb-8 font-medium">We'll send you an OTP to verify your account.</p>
               
-              <div className="flex items-center gap-4 bg-slate-50 border border-slate-200 rounded-2xl p-4 focus-within:border-brand-yellow focus-within:ring-2 focus-within:ring-brand-yellow/20 transition-all">
-                <span className="text-slate-400 font-bold">+91</span>
+              <div className="flex items-center gap-4 bg-slate-50 border-2 border-slate-100 rounded-3xl p-5 focus-within:border-brand-yellow focus-within:bg-white focus-within:shadow-[0_0_30px_rgba(250,204,21,0.15)] transition-all duration-300">
+                <span className="text-slate-400 font-black text-xl tracking-tighter">+91</span>
                 <input 
                   type="tel"
                   maxLength={10}
                   placeholder="99999 99999"
-                  className="bg-transparent w-full text-xl font-bold text-brand-slate border-none focus:outline-none"
+                  className="bg-transparent w-full text-2xl font-black text-brand-slate border-none focus:outline-none placeholder:text-slate-300"
                   value={formData.phone_number}
                   onChange={(e) => updateForm("phone_number", e.target.value.replace(/\D/g, '').slice(0, 10))}
                 />
               </div>
 
-              <button 
+              <motion.button 
+                whileTap={{ scale: 0.97 }}
                 onClick={handleNext}
                 disabled={formData.phone_number.length < 10}
-                className="w-full mt-8 py-4 bg-brand-slate text-white font-bold rounded-2xl hover:bg-black transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full mt-8 py-5 bg-brand-slate text-white text-lg font-black rounded-3xl hover:bg-black transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-xl"
               >
-                Send OTP <ArrowRight className="w-5 h-5" />
-              </button>
+                Send OTP <ArrowRight className="w-6 h-6" />
+              </motion.button>
             </motion.div>
           )}
 
@@ -279,26 +288,30 @@ export default function OnboardingWizard() {
                 </motion.div>
               )}
 
-              <label className="block text-sm font-bold text-brand-slate mb-2 mt-6">Or Type Manual ID</label>
+              <label className="block text-sm font-black text-brand-slate uppercase tracking-widest mb-2 mt-8 opacity-40">Worker ID / Partner App Tag</label>
               <input 
                  type="text"
-                 placeholder="e.g. ZOM-8192"
-                 disabled={hasScanned}
-                 className={`w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-lg font-bold text-brand-slate uppercase focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 outline-none ${hasScanned ? 'opacity-50 cursor-not-allowed hidden' : ''}`}
+                 placeholder="e.g. ABC or Worker-9102"
+                 className="w-full bg-slate-50 border-2 border-slate-100 rounded-3xl p-5 text-xl font-black text-brand-slate uppercase focus:border-brand-yellow focus:bg-white transition-all outline-none"
                  value={formData.platform_worker_id}
                  onChange={(e) => updateForm("platform_worker_id", e.target.value)}
               />
 
-              <button 
+              <motion.button 
+                whileTap={{ scale: 0.97 }}
                 onClick={() => {
                   setStep(4);
                   setTimeout(() => setStep(5), 2500);
                 }}
                 disabled={!formData.name || !formData.platform || !formData.platform_worker_id}
-                className="w-full mt-8 py-4 bg-brand-yellow text-brand-dark font-black rounded-2xl hover:bg-black hover:text-white transition-all disabled:opacity-50"
+                className="w-full mt-10 py-5 bg-brand-yellow text-brand-dark text-lg font-black rounded-3xl hover:bg-black hover:text-white transition-all disabled:opacity-30 flex items-center justify-center gap-2 shadow-xl shadow-brand-yellow/10"
               >
                 Continue
-              </button>
+              </motion.button>
+
+              {(!formData.name || !formData.platform || !formData.platform_worker_id) && (
+                <p className="text-center mt-4 text-xs font-black text-slate-300 uppercase tracking-widest">Please fill all fields to continue</p>
+              )}
             </motion.div>
           )}
 
@@ -320,37 +333,39 @@ export default function OnboardingWizard() {
                 <input 
                   type="text"
                   placeholder="e.g. Bandra, Mumbai"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-lg font-bold text-brand-slate focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 outline-none"
+                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-3xl p-5 text-xl font-black text-brand-slate focus:border-brand-yellow focus:bg-white transition-all outline-none"
                   value={formData.primary_zone}
                   onChange={(e) => updateForm("primary_zone", e.target.value)}
                 />
                 
                 <div className="relative flex items-center py-2">
                   <div className="flex-grow border-t border-slate-100"></div>
-                  <span className="flex-shrink-0 mx-4 text-slate-400 text-sm font-bold">OR</span>
+                  <span className="flex-shrink-0 mx-4 text-slate-400 text-xs font-black">OR</span>
                   <div className="flex-grow border-t border-slate-100"></div>
                 </div>
 
-                <button 
+                <motion.button 
+                  whileTap={{ scale: 0.97 }}
                   onClick={autoDetectLocation}
                   disabled={isDetecting}
-                  className="w-full p-4 rounded-2xl font-bold text-brand-slate transition-all border-2 border-brand-yellow bg-brand-yellow/10 hover:bg-brand-yellow hover:text-brand-dark flex justify-center items-center gap-2 disabled:opacity-50"
+                  className="w-full p-5 rounded-3xl font-black text-brand-slate transition-all border-2 border-brand-yellow bg-brand-yellow/5 hover:bg-brand-yellow hover:text-brand-dark flex justify-center items-center gap-3 disabled:opacity-30"
                 >
                   {isDetecting ? (
-                    <><Loader2 className="w-5 h-5 animate-spin"/> Locating Satellite...</>
+                    <><Loader2 className="w-6 h-6 animate-spin"/> Locating Satellite...</>
                   ) : (
                     <>📍 Auto-Detect My Location</>
                   )}
-                </button>
+                </motion.button>
               </div>
 
-              <button 
+              <motion.button 
+                whileTap={{ scale: 0.97 }}
                 onClick={() => setStep(6)}
                 disabled={!formData.primary_zone}
-                className="w-full mt-4 py-4 bg-brand-yellow text-brand-dark font-black rounded-2xl hover:bg-black hover:text-white transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full mt-6 py-5 bg-brand-slate text-white text-lg font-black rounded-3xl hover:bg-black transition-all disabled:opacity-30 flex items-center justify-center gap-2"
               >
                 Continue to Payouts
-              </button>
+              </motion.button>
             </motion.div>
           )}
 
@@ -370,17 +385,22 @@ export default function OnboardingWizard() {
                  value={formData.upi_id}
                  onChange={(e) => updateForm("upi_id", e.target.value.toLowerCase())}
               />
-              <button 
+              <motion.button 
+                whileTap={{ scale: 0.97 }}
                 onClick={handleSubmit}
                 disabled={!formData.upi_id.includes("@") || isSubmitting}
-                className="w-full py-4 bg-brand-yellow text-brand-dark font-black rounded-2xl hover:bg-black hover:text-white transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-xl shadow-brand-yellow/20"
+                className="w-full py-5 bg-black text-white text-lg font-black rounded-3xl hover:bg-brand-yellow hover:text-black transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-xl shadow-brand-yellow/10"
               >
                 {isSubmitting ? (
-                  <><Loader2 className="w-5 h-5 animate-spin" /> Finalizing Protecton...</>
+                  <><Loader2 className="w-6 h-6 animate-spin" /> Finalizing Protection...</>
                 ) : (
-                  <><ShieldCheck className="w-5 h-5" /> Lock & Generate Plan</>
+                  <><ShieldCheck className="w-6 h-6" /> Lock & Generate Plan</>
                 )}
-              </button>
+              </motion.button>
+              
+              {error && (
+                <p className="text-red-500 text-xs font-black uppercase text-center mt-4 tracking-wider animate-pulse">{error}</p>
+              )}
             </motion.div>
           )}
 
