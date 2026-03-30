@@ -1,19 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { 
+  Zap, CloudRain, Wind, AlertCircle, History, 
+  Terminal, Activity, ShieldAlert, Cpu, Globe, 
+  BarChart3, Settings, Play, RefreshCw, Layers 
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CloudLightning, Wind, AlertTriangle, ShieldCheck, CheckCircle2, ChevronRight, Zap } from "lucide-react";
-import Navbar from "@/components/Navbar";
 
-export default function DashboardPage() {
-  const [simulationParams, setSimulationParams] = useState({ zone: "" });
-  const [isSimulating, setIsSimulating] = useState(false);
-  const [result, setResult] = useState<any>(null);
+export default function Dashboard() {
   const [payoutHistory, setPayoutHistory] = useState<any[]>([]);
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [simulationParams, setSimulationParams] = useState({
+    trigger_type: "Flood",
+    severity: "High",
+    zone: "Mumbai"
+  });
+  const [result, setResult] = useState<any>(null);
 
   const fetchPayoutHistory = async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/payouts/");
+      const res = await fetch("/api/payouts/");
       const data = await res.json();
       setPayoutHistory(data);
     } catch (err) {
@@ -25,203 +32,258 @@ export default function DashboardPage() {
     setIsSimulating(true);
     setResult(null);
     try {
-      const res = await fetch("http://localhost:8000/api/triggers/simulate", {
+      const res = await fetch("/api/triggers/simulate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(simulationParams),
       });
       const data = await res.json();
       setResult(data);
-      fetchPayoutHistory(); // Refresh history after simulation
+      fetchPayoutHistory(); 
     } catch (err) {
       console.error(err);
     }
     setIsSimulating(false);
   };
 
-  // Initial fetch
-  useState(() => {
+  useEffect(() => {
     fetchPayoutHistory();
-  });
+  }, []);
 
   return (
-    <main className="min-h-screen bg-slate-50 text-brand-slate selection:bg-brand-yellow selection:text-brand-dark flex flex-col">
-      <Navbar />
-
-      <div className="container mx-auto px-4 py-12 flex-grow flex flex-col items-center">
-        
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center px-3 py-1 mb-6 rounded-full bg-brand-slate text-white font-black text-xs uppercase tracking-widest">
-            <Zap className="w-4 h-4 mr-2" />
-            System Administration
-          </div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-4 text-brand-slate">
-            Emergency Command Center
-          </h1>
-          <p className="text-slate-500 font-medium">
-            Monitor and manage disruption events across active zones to ensure ShramShield's parametric engine provides instant protection.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
-          
-          {/* Controls */}
-          <div className="bg-white p-8 rounded-[32px] shadow-sm border border-slate-100 h-fit">
-            <h2 className="text-2xl font-black mb-6 flex items-center gap-2">
-              <CloudLightning className="text-brand-yellow" /> Parameters
-            </h2>
-            
-            <div className="mb-8">
-              <label className="block text-sm font-bold text-brand-slate mb-3">Target Disruption Zone</label>
-              <input 
-                type="text"
-                value={simulationParams.zone}
-                onChange={(e) => setSimulationParams({ zone: e.target.value })}
-                placeholder="Enter Target Zone (e.g. Pune)"
-                className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-lg font-bold text-brand-slate mb-4 focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 outline-none"
-              />
+    <main className="min-h-screen bg-brand-slate text-white selection:bg-brand-yellow selection:text-brand-dark p-6 sm:p-10 font-sans">
+      
+      {/* HUD Header */}
+      <header className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-16 relative">
+         <div className="absolute top-[-100px] left-[-100px] w-64 h-64 bg-brand-yellow/5 rounded-full blur-[120px] pointer-events-none" />
+         
+         <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-2">
+               <div className="p-2 bg-brand-yellow rounded-xl shadow-[0_0_20px_rgba(250,204,21,0.2)]">
+                  <Terminal className="w-6 h-6 text-brand-dark" />
+               </div>
+               <h1 className="text-sm font-black uppercase tracking-[0.4em] text-brand-yellow">Emergency Command Center</h1>
             </div>
+            <h2 className="text-4xl font-black tracking-tighter leading-tight italic">AI Parametric Simulation Core</h2>
+         </div>
 
-            <div className="bg-slate-50 p-4 rounded-2xl mb-8 border border-slate-100">
-               <p className="text-sm font-medium text-slate-500 mb-2">Simulated Event Override</p>
-               <ul className="space-y-3 font-bold text-brand-slate">
-                 <li className="flex justify-between items-center"><span className="flex items-center gap-2"><CloudLightning className="w-4 h-4 text-blue-500"/> Flash Flood (&gt;50mm)</span> <span className="text-xs px-2 py-1 bg-white rounded-md border border-slate-200 text-slate-400">If Flood Risk (Default)</span></li>
-                 <li className="flex justify-between items-center"><span className="flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-red-500"/> Curfew Lockout</span> <span className="text-xs px-2 py-1 bg-white rounded-md border border-slate-200 text-slate-400">If High Tension</span></li>
-                 <li className="flex justify-between items-center"><span className="flex items-center gap-2"><Wind className="w-4 h-4 text-green-500"/> Severe AQI (&gt;400)</span> <span className="text-xs px-2 py-1 bg-white rounded-md border border-slate-200 text-slate-400">If High Pollution</span></li>
-               </ul>
-            </div>
-
-            <button 
-              onClick={handleSimulate}
-              disabled={isSimulating}
-              className="w-full py-4 bg-red-600 text-white font-black rounded-2xl hover:bg-red-700 transition-all shadow-xl shadow-red-600/20 disabled:opacity-50 flex justify-center items-center gap-2"
-            >
-              {isSimulating ? "Connecting to APIs..." : "Execute Weather Event"}
-            </button>
-          </div>
-
-          {/* Results Screen */}
-          <div className="bg-brand-slate p-8 rounded-[32px] shadow-2xl overflow-hidden relative min-h-[400px]">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-brand-yellow/5 rounded-full blur-3xl" />
-            
-            <h2 className="text-2xl font-black text-white mb-6 flex items-center gap-2 relative z-10">
-              <ShieldCheck className="text-brand-yellow" /> Live Engine Output
-            </h2>
-
-            {!result && !isSimulating && (
-              <div className="h-full flex items-center justify-center opacity-30 text-white font-mono text-sm">
-                Awaiting Disruption Signal...
-              </div>
-            )}
-
-            {isSimulating && (
-              <div className="flex flex-col gap-4 text-yellow-500 font-mono text-sm relative z-10">
-                 <motion.p initial={{opacity:0}} animate={{opacity:1}}>&gt;&gt; Authenticating API...</motion.p>
-                 <motion.p initial={{opacity:0}} animate={{opacity:1}} transition={{delay: 0.5}}>&gt;&gt; Polling Weather Data for {simulationParams.zone}...</motion.p>
-                 <motion.p initial={{opacity:0}} animate={{opacity:1}} transition={{delay: 1.0}}>&gt;&gt; Running Parametric Threshold Checks...</motion.p>
-              </div>
-            )}
-
-            <AnimatePresence>
-              {result && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="relative z-10"
-                >
-                  <div className={`p-4 rounded-xl border mb-6 ${result.status === "disrupted" ? "bg-red-500/10 border-red-500/20 text-red-100" : "bg-green-500/10 border-green-500/20 text-green-100"}`}>
-                    <p className="font-bold font-mono text-sm">{result.message}</p>
+         <div className="flex items-center gap-4 relative z-10">
+            <div className="hidden sm:flex flex-col items-end">
+               <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-1">System Integrity</p>
+               <div className="flex items-center gap-2">
+                  <div className="flex gap-1">
+                     {[1, 2, 3, 4, 5].map(i => <div key={i} className="w-3 h-1.5 bg-green-500 rounded-sm" />)}
                   </div>
+                  <span className="text-[10px] font-black text-green-500">99.9%</span>
+               </div>
+            </div>
+            <div className="h-10 w-px bg-white/10 hidden sm:block" />
+            <button 
+               onClick={fetchPayoutHistory}
+               className="p-3 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all hover:scale-105 active:scale-95"
+            >
+               <RefreshCw className="w-5 h-5 text-slate-400" />
+            </button>
+         </div>
+      </header>
 
-                  {result.telemetry && (
-                     <div className="grid grid-cols-2 gap-4 mb-6">
-                        <div className="bg-white/5 p-3 rounded-xl">
-                          <p className="text-xs text-slate-400 font-bold mb-1">Rainfall (3h)</p>
-                          <p className="text-white font-black font-mono">{result.telemetry.rainfall_mm_3h.toFixed(1)}mm</p>
-                        </div>
-                        <div className="bg-white/5 p-3 rounded-xl">
-                          <p className="text-xs text-slate-400 font-bold mb-1">Air Quality</p>
-                          <p className="text-white font-black font-mono">{result.telemetry.aqi} AQI</p>
-                        </div>
-                     </div>
-                  )}
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+        
+        {/* Simulator Control Panel */}
+        <div className="lg:col-span-5 space-y-8">
+           <div className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[32px] p-8 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform">
+                <Cpu className="w-32 h-32" />
+              </div>
+              
+              <div className="flex items-center gap-3 mb-8">
+                 <Settings className="w-5 h-5 text-brand-yellow" />
+                 <h3 className="font-black uppercase text-xs tracking-widest text-slate-400">Simulation Configuration</h3>
+              </div>
 
-                  {result.payouts && result.payouts.length > 0 && (
-                    <motion.div 
-                      initial={{ scale: 0.9, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ type: "spring", delay: 0.5 }}
-                      className="bg-brand-yellow rounded-2xl p-6 shadow-2xl shadow-brand-yellow/20"
+              <div className="space-y-6 relative z-10">
+                 <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] px-2 italic">Disruption Type</label>
+                    <div className="grid grid-cols-3 gap-3">
+                       {["Flood", "Cyclone", "Curfew"].map(type => (
+                         <button 
+                           key={type}
+                           onClick={() => setSimulationParams(p => ({...p, trigger_type: type}))}
+                           className={`py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all ${simulationParams.trigger_type === type ? 'bg-brand-yellow text-brand-dark border-brand-yellow' : 'bg-white/5 text-slate-500 border-white/10 hover:border-white/20'}`}
+                         >
+                           {type}
+                         </button>
+                       ))}
+                    </div>
+                 </div>
+
+                 <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] px-2 italic">Impact Severity</label>
+                    <select 
+                      value={simulationParams.severity}
+                      onChange={(e) => setSimulationParams(p => ({...p, severity: e.target.value}))}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 font-black text-sm outline-none focus:border-brand-yellow transition-all appearance-none"
                     >
-                      <div className="flex items-center gap-3 mb-2 text-brand-slate">
-                        <CheckCircle2 className="w-6 h-6" />
-                        <span className="font-black text-lg">Razorpay Auto-Payout</span>
-                      </div>
-                      
-                      {result.payouts.map((p: any, i: number) => (
-                        <div key={i} className="bg-white/80 p-3 rounded-xl mt-3 flex justify-between items-center text-brand-slate">
-                           <div>
-                             <p className="font-black">Policy #{p.policy_id}</p>
-                             <p className="text-xs font-bold text-red-600">{p.trigger_reason}</p>
-                           </div>
-                           <p className="text-2xl font-black">₹{p.payout_amount}</p>
-                        </div>
-                      ))}
-                    </motion.div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
+                      <option className="bg-brand-slate">Extreme</option>
+                      <option className="bg-brand-slate">High</option>
+                      <option className="bg-brand-slate">Moderate</option>
+                    </select>
+                 </div>
 
-        {/* Global Audit Log */}
-        <div className="w-full max-w-4xl mt-12 bg-white rounded-[32px] p-8 border border-slate-100 shadow-sm">
-           <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-black flex items-center gap-3 text-brand-slate">
-                 <CheckCircle2 className="text-green-500" /> Automated Audit Log
-              </h2>
-              <div className="px-3 py-1 bg-green-50 text-green-600 rounded-full text-xs font-black uppercase tracking-widest border border-green-100">
-                 Real-Time Ledger
+                 <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] px-2 italic">Target Geo-Zone</label>
+                    <input 
+                      type="text"
+                      placeholder="e.g. Mumbai, Navi Mumbai..."
+                      value={simulationParams.zone}
+                      onChange={(e) => setSimulationParams(p => ({...p, zone: e.target.value}))}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 font-black text-sm outline-none focus:border-brand-yellow transition-all placeholder:text-slate-600"
+                    />
+                 </div>
+
+                 <motion.button 
+                   whileTap={{ scale: 0.98 }}
+                   onClick={handleSimulate}
+                   disabled={isSimulating}
+                   className="w-full py-5 bg-white text-brand-dark font-black rounded-2xl hover:bg-brand-yellow transition-all shadow-[0_20px_50px_rgba(255,255,255,0.05)] disabled:opacity-50 flex items-center justify-center gap-3 text-lg"
+                 >
+                    {isSimulating ? (
+                      <><Loader2 className="w-6 h-6 animate-spin" /> RUNNING HASH CORE...</>
+                    ) : (
+                      <><Play className="w-5 h-5 fill-current" /> EXECUTE TRIGGER</>
+                    )}
+                 </motion.button>
               </div>
            </div>
 
-           {payoutHistory.length === 0 ? (
-             <div className="text-center py-12 text-slate-400 font-bold border-2 border-dashed border-slate-50 rounded-2xl">
-                No recent transactions processed.
-             </div>
-           ) : (
-             <div className="overflow-x-auto">
-               <table className="w-full text-left">
-                  <thead>
-                    <tr className="text-xs font-black uppercase text-slate-400 tracking-widest border-b border-slate-50">
-                      <th className="pb-4">Timestamp</th>
-                      <th className="pb-4">Policy</th>
-                      <th className="pb-4">Trigger</th>
-                      <th className="pb-4">Reason</th>
-                      <th className="pb-4 text-right">Payout</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50">
-                    {payoutHistory.map((p, i) => (
-                      <tr key={i} className="text-sm font-bold text-brand-slate hover:bg-slate-50 transition-colors">
-                        <td className="py-4 text-slate-400">{new Date(p.processed_at).toLocaleTimeString()}</td>
-                        <td className="py-4">#00{p.policy_id}</td>
-                        <td className="py-4">
-                           <span className="px-2 py-1 bg-brand-yellow/10 text-brand-slate rounded text-[10px] border border-brand-yellow/20">
-                             {p.trigger_type}
-                           </span>
-                        </td>
-                        <td className="py-4 text-slate-500 font-medium">{p.trigger_reason}</td>
-                        <td className="py-4 text-right font-black text-green-600">+₹{p.amount}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-               </table>
-             </div>
-           )}
+           {/* Live Telemetry View */}
+           <div className="bg-white/5 border border-white/10 rounded-[32px] p-8 overflow-hidden relative group">
+              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
+              <div className="flex justify-between items-center mb-6 relative z-10">
+                 <div className="flex items-center gap-3">
+                   <Activity className="w-5 h-5 text-blue-500" />
+                   <h3 className="font-black uppercase text-xs tracking-widest text-slate-400">Satellite Telemetry</h3>
+                 </div>
+                 <span className="flex items-center gap-2 text-[10px] font-black text-blue-500 uppercase tracking-widest">
+                   <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping" />
+                   Real-time
+                 </span>
+              </div>
+              
+              <div className="h-40 flex items-end gap-1 relative z-10">
+                 {[40, 70, 45, 90, 65, 80, 50, 40, 95, 60, 40, 30, 80, 70, 50, 90, 50, 60, 40, 85, 30, 50, 80, 60, 40, 70].map((h, i) => (
+                   <motion.div 
+                     key={i}
+                     initial={{ height: 0 }}
+                     animate={{ height: `${h}%` }}
+                     transition={{ delay: i * 0.05 }}
+                     className="flex-grow bg-gradient-to-t from-blue-500/20 to-blue-500 rounded-t-sm"
+                   />
+                 ))}
+              </div>
+           </div>
+        </div>
+
+        {/* Audit Log / Payout History */}
+        <div className="lg:col-span-7 flex flex-col gap-8">
+           
+           {/* Simulation Result Overlay - Only if result exists */}
+           <AnimatePresence>
+             {result && (
+               <motion.div 
+                 initial={{ scale: 0.95, opacity: 0 }}
+                 animate={{ scale: 1, opacity: 1 }}
+                 className="bg-brand-yellow rounded-[32px] p-8 border border-brand-yellow shadow-2xl shadow-brand-yellow/20 relative overflow-hidden"
+               >
+                  <div className="absolute top-0 right-0 p-8 opacity-10">
+                     <ShieldAlert className="w-32 h-32 text-brand-dark" />
+                  </div>
+                  <div className="relative z-10">
+                    <h4 className="font-black text-brand-dark uppercase text-xs tracking-[0.3em] mb-4">Simulation Result</h4>
+                    <p className="text-brand-dark font-black text-3xl italic tracking-tight mb-8">
+                      {result.message}
+                    </p>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                       <div className="bg-brand-dark/10 backdrop-blur-md rounded-2xl p-5 border border-brand-dark/10">
+                          <p className="text-[10px] font-black text-brand-dark/50 uppercase tracking-widest mb-1 italic">Total Claims Issued</p>
+                          <p className="text-3xl font-black text-brand-dark tracking-tighter italic">{result.count}</p>
+                       </div>
+                       <div className="bg-brand-dark/10 backdrop-blur-md rounded-2xl p-5 border border-brand-dark/10">
+                          <p className="text-[10px] font-black text-brand-dark/50 uppercase tracking-widest mb-1 italic">Simulation Precision</p>
+                          <p className="text-3xl font-black text-brand-dark tracking-tighter italic">98.4%</p>
+                       </div>
+                    </div>
+                  </div>
+               </motion.div>
+             )}
+           </AnimatePresence>
+
+           <div className="flex-grow bg-white/5 border border-white/10 rounded-[40px] p-8 flex flex-col">
+              <div className="flex items-center justify-between mb-8">
+                 <div className="flex items-center gap-3">
+                   <Globe className="w-5 h-5 text-brand-yellow" />
+                   <h3 className="font-black uppercase text-xs tracking-widest text-slate-400 italic">Parametric Audit Log</h3>
+                 </div>
+                 <div className="flex gap-2">
+                    <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[10px] font-black text-slate-400">SHRAM-v2.0</div>
+                 </div>
+              </div>
+
+              <div className="flex-grow space-y-4">
+                 {payoutHistory.length > 0 ? (
+                   payoutHistory.map((p, i) => (
+                      <motion.div 
+                        initial={{ x: 20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: i * 0.1 }}
+                        key={p.id}
+                        className="bg-white/5 border border-white/5 rounded-2xl p-5 flex items-center justify-between hover:bg-white/10 transition-all hover:border-brand-yellow/30"
+                      >
+                         <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center font-black text-brand-yellow text-xs shadow-inner">
+                               SIM
+                            </div>
+                            <div>
+                               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-0.5 italic">Trigger</p>
+                               <p className="font-black text-lg tracking-tighter uppercase leading-none">{p.trigger_type}</p>
+                            </div>
+                         </div>
+
+                         <div className="hidden sm:block text-center">
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-0.5 italic">Recipient ID</p>
+                            <p className="font-bold text-sm tracking-widest opacity-60">WORKER-ID: {p.user_id}</p>
+                         </div>
+
+                         <div className="text-right">
+                            <p className="text-xl font-black text-brand-yellow tracking-tighter italic">₹{p.amount}</p>
+                            <p className="text-[10px] font-black text-green-500 uppercase tracking-widest leading-none mt-1">Processed</p>
+                         </div>
+                      </motion.div>
+                   ))
+                 ) : (
+                   <div className="h-full flex flex-col items-center justify-center opacity-20 py-20">
+                      <BarChart3 className="w-20 h-20 mb-4" />
+                      <p className="font-black uppercase tracking-[0.3em] text-xs">No Payout Telemetry</p>
+                   </div>
+                 )}
+              </div>
+           </div>
         </div>
       </div>
+
+      <Loader />
     </main>
+  );
+}
+
+function Loader() {
+  return (
+    <div className="fixed bottom-10 right-10 flex flex-col items-end gap-2 pointer-events-none">
+       <div className="flex gap-1">
+          {[1, 2, 3].map(i => <motion.div key={i} animate={{ opacity: [0.2, 1, 0.2] }} transition={{ repeat: Infinity, duration: 1.5, delay: i * 0.2 }} className="w-1.5 h-1.5 bg-brand-yellow rounded-full shadow-[0_0_8px_rgba(250,204,21,0.5)]" />)}
+       </div>
+       <p className="text-[8px] font-black uppercase tracking-[0.4em] text-slate-500">Global Monitoring Active</p>
+    </div>
   );
 }

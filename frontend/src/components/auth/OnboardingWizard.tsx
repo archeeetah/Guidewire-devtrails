@@ -17,7 +17,6 @@ export default function OnboardingWizard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successData, setSuccessData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-  const API_URL = "http://127.0.0.1:8001";
   const [platformSearch, setPlatformSearch] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
@@ -82,19 +81,22 @@ export default function OnboardingWizard() {
     setError(null);
     try {
       // 1. Register User
-      const userRes = await fetch(`${API_URL}/api/users/register`, {
+      const userRes = await fetch("/api/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
       });
       
-      if (!userRes.ok) throw new Error("Verification Failed");
+      if (!userRes.ok) {
+        const errData = await userRes.json().catch(() => ({}));
+        throw new Error(errData.detail || "Registration failed");
+      }
       
       const userData = await userRes.json();
       localStorage.setItem("worker_phone", formData.phone_number);
       
       // 2. Fetch Initial Quote
-      const quoteRes = await fetch(`${API_URL}/api/policies/quote`, {
+      const quoteRes = await fetch("/api/policies/quote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -109,9 +111,9 @@ export default function OnboardingWizard() {
       
       setSuccessData({ user: userData, quote: quoteData });
       setStep(7);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Registration failed", err);
-      setError("Network Outage: Backend unreachable at 127.0.0.1:8001");
+      setError(err.message || "Connection failed. Please ensure the backend server is running.");
     }
     setIsSubmitting(false);
   };
