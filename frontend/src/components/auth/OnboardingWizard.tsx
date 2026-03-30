@@ -319,7 +319,7 @@ export default function OnboardingWizard() {
               <div className="flex flex-col gap-4">
                 <input 
                   type="text"
-                  placeholder="e.g. Andheri East, Mumbai"
+                  placeholder="e.g. Bandra, Mumbai"
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-lg font-bold text-brand-slate focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 outline-none"
                   value={formData.primary_zone}
                   onChange={(e) => updateForm("primary_zone", e.target.value)}

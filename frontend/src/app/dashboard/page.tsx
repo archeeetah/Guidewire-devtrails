@@ -6,7 +6,7 @@ import { CloudLightning, Wind, AlertTriangle, ShieldCheck, CheckCircle2, Chevron
 import Navbar from "@/components/Navbar";
 
 export default function DashboardPage() {
-  const [simulationParams, setSimulationParams] = useState({ zone: "Andheri" });
+  const [simulationParams, setSimulationParams] = useState({ zone: "" });
   const [isSimulating, setIsSimulating] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [payoutHistory, setPayoutHistory] = useState<any[]>([]);
