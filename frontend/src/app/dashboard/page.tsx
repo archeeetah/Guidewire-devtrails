@@ -313,17 +313,6 @@ export default function Dashboard() {
            </div>
         </div>
       </div>
-)
-                 ) : (
-                   <div className="h-full flex flex-col items-center justify-center opacity-20 py-20">
-                      <BarChart3 className="w-20 h-20 mb-4" />
-                      <p className="font-black uppercase tracking-[0.3em] text-xs">No Payout Telemetry</p>
-                   </div>
-                 )}
-              </div>
-           </div>
-        </div>
-      </div>
 
       <Loader />
     </main>
