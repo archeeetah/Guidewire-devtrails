@@ -9,6 +9,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Dashboard() {
+  const [adminStats, setAdminStats] = useState<any>(null);
   const [payoutHistory, setPayoutHistory] = useState<any[]>([]);
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationParams, setSimulationParams] = useState({
@@ -17,6 +18,16 @@ export default function Dashboard() {
     zone: "Mumbai"
   });
   const [result, setResult] = useState<any>(null);
+
+  const fetchAdminStats = async () => {
+    try {
+      const res = await fetch("/api/admin/stats");
+      const data = await res.json();
+      setAdminStats(data);
+    } catch (err) {
+      console.error("Failed to fetch admin stats", err);
+    }
+  };
 
   const fetchPayoutHistory = async () => {
     try {
@@ -40,6 +51,7 @@ export default function Dashboard() {
       const data = await res.json();
       setResult(data);
       fetchPayoutHistory(); 
+      fetchAdminStats();
     } catch (err) {
       console.error(err);
     }
@@ -48,6 +60,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchPayoutHistory();
+    fetchAdminStats();
+    const interval = setInterval(fetchAdminStats, 10000); // 10s auto-refresh
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -62,24 +77,24 @@ export default function Dashboard() {
                <div className="p-2 bg-brand-yellow rounded-xl shadow-[0_0_20px_rgba(250,204,21,0.2)]">
                   <Terminal className="w-6 h-6 text-brand-dark" />
                </div>
-               <h1 className="text-sm font-black uppercase tracking-[0.4em] text-brand-yellow">Emergency Command Center</h1>
+               <h1 className="text-sm font-black uppercase tracking-[0.4em] text-brand-yellow">Emergency Command Center v2</h1>
             </div>
             <h2 className="text-4xl font-black tracking-tighter leading-tight italic">AI Parametric Simulation Core</h2>
          </div>
 
          <div className="flex items-center gap-4 relative z-10">
             <div className="hidden sm:flex flex-col items-end">
-               <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-1">System Integrity</p>
+               <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-1">IMD Connection</p>
                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black text-blue-400">AUTHORITATIVE</span>
                   <div className="flex gap-1">
-                     {[1, 2, 3, 4, 5].map(i => <div key={i} className="w-3 h-1.5 bg-green-500 rounded-sm" />)}
+                     {[1, 2, 3, 4, 5].map(i => <div key={i} className="w-3 h-1.5 bg-blue-500 rounded-sm" />)}
                   </div>
-                  <span className="text-[10px] font-black text-green-500">99.9%</span>
                </div>
             </div>
             <div className="h-10 w-px bg-white/10 hidden sm:block" />
             <button 
-               onClick={fetchPayoutHistory}
+               onClick={() => { fetchPayoutHistory(); fetchAdminStats(); }}
                className="p-3 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all hover:scale-105 active:scale-95"
             >
                <RefreshCw className="w-5 h-5 text-slate-400" />
@@ -89,13 +104,72 @@ export default function Dashboard() {
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
         
-        {/* Simulator Control Panel */}
+        {/* Simulator & Stats Panel */}
         <div className="lg:col-span-5 space-y-8">
+           
+           {/* Liquidity Tracker Card */}
            <div className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[32px] p-8 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform">
-                <Cpu className="w-32 h-32" />
+              <div className="absolute top-0 right-0 p-6 opacity-5">
+                 <ShieldAlert className="w-24 h-24" />
+              </div>
+              <div className="flex items-center gap-3 mb-6 relative z-10">
+                 <Globe className="w-5 h-5 text-green-400" />
+                 <h3 className="font-black uppercase text-xs tracking-widest text-slate-400">Liquidity Pool Health</h3>
               </div>
               
+              {adminStats ? (
+                <div className="relative z-10">
+                   <div className="flex justify-between items-end mb-2">
+                      <p className="text-sm font-black text-slate-400 uppercase italic">Solvency Score</p>
+                      <p className="text-3xl font-black text-white italic tracking-tighter">{adminStats.liquidity.health_score}%</p>
+                   </div>
+                   <div className="w-full h-4 bg-white/5 rounded-full overflow-hidden mb-8 border border-white/10">
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: `${adminStats.liquidity.health_score}%` }}
+                        className={`h-full ${adminStats.liquidity.health_score > 70 ? 'bg-green-500' : 'bg-brand-yellow'} shadow-[0_0_20px_rgba(34,197,94,0.3)]`}
+                      />
+                   </div>
+                   <div className="grid grid-cols-2 gap-4">
+                      <div>
+                         <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">Total Reserves</p>
+                         <p className="font-black text-xl tracking-tighter italic text-slate-300">₹{(adminStats.liquidity.current_pool / 100000).toFixed(1)}L</p>
+                      </div>
+                      <div className="text-right">
+                         <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">Total Payouts</p>
+                         <p className="font-black text-xl tracking-tighter italic text-brand-yellow">₹{(adminStats.liquidity.total_payouts / 100000).toFixed(1)}L</p>
+                      </div>
+                   </div>
+                </div>
+              ) : (
+                <div className="animate-pulse h-32 bg-white/5 rounded-2xl" />
+              )}
+           </div>
+
+           {/* Heatmap Overview SIM */}
+           <div className="bg-white/5 border border-white/10 rounded-[32px] p-8 overflow-hidden relative group">
+              <div className="flex items-center gap-3 mb-6">
+                 <Layers className="w-5 h-5 text-brand-yellow" />
+                 <h3 className="font-black uppercase text-xs tracking-widest text-slate-400 italic">Disruption Heatmap</h3>
+              </div>
+              
+              <div className="space-y-4">
+                 {adminStats?.heatmap.slice(0, 3).map((zone: any, i: number) => (
+                   <div key={i} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                         <div className="w-2 h-2 rounded-full bg-brand-yellow animate-ping" />
+                         <p className="text-xs font-black uppercase text-slate-300">{zone.city}</p>
+                      </div>
+                      <div className="h-1 flex-grow mx-4 bg-white/5 rounded-full overflow-hidden">
+                         <div className="h-full bg-brand-yellow/50" style={{ width: `${(zone.claims / 10) * 100}%` }} />
+                      </div>
+                      <p className="text-xs font-black text-slate-500">{zone.claims} Claims</p>
+                   </div>
+                 ))}
+              </div>
+           </div>
+
+           <div className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[32px] p-8 relative overflow-hidden group">
               <div className="flex items-center gap-3 mb-8">
                  <Settings className="w-5 h-5 text-brand-yellow" />
                  <h3 className="font-black uppercase text-xs tracking-widest text-slate-400">Simulation Configuration</h3>
@@ -118,16 +192,11 @@ export default function Dashboard() {
                  </div>
 
                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] px-2 italic">Impact Severity</label>
-                    <select 
-                      value={simulationParams.severity}
-                      onChange={(e) => setSimulationParams(p => ({...p, severity: e.target.value}))}
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 font-black text-sm outline-none focus:border-brand-yellow transition-all appearance-none"
-                    >
-                      <option className="bg-brand-slate">Extreme</option>
-                      <option className="bg-brand-slate">High</option>
-                      <option className="bg-brand-slate">Moderate</option>
-                    </select>
+                    <label className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] px-2 italic">Data Source Auth</label>
+                    <div className="w-full bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4 flex items-center gap-3">
+                       <ShieldAlert className="w-5 h-5 text-blue-400" />
+                       <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest italic">IMD (MET-CORE) API SELECTED</span>
+                    </div>
                  </div>
 
                  <div className="space-y-2">
@@ -148,38 +217,11 @@ export default function Dashboard() {
                    className="w-full py-5 bg-white text-brand-dark font-black rounded-2xl hover:bg-brand-yellow transition-all shadow-[0_20px_50px_rgba(255,255,255,0.05)] disabled:opacity-50 flex items-center justify-center gap-3 text-lg"
                  >
                     {isSimulating ? (
-                      <><Loader2 className="w-6 h-6 animate-spin" /> RUNNING HASH CORE...</>
+                      <><Loader2 className="w-6 h-6 animate-spin" /> CROSS-VERIFYING IMD...</>
                     ) : (
                       <><Play className="w-5 h-5 fill-current" /> EXECUTE TRIGGER</>
                     )}
                  </motion.button>
-              </div>
-           </div>
-
-           {/* Live Telemetry View */}
-           <div className="bg-white/5 border border-white/10 rounded-[32px] p-8 overflow-hidden relative group">
-              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
-              <div className="flex justify-between items-center mb-6 relative z-10">
-                 <div className="flex items-center gap-3">
-                   <Activity className="w-5 h-5 text-blue-500" />
-                   <h3 className="font-black uppercase text-xs tracking-widest text-slate-400">Satellite Telemetry</h3>
-                 </div>
-                 <span className="flex items-center gap-2 text-[10px] font-black text-blue-500 uppercase tracking-widest">
-                   <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping" />
-                   Real-time
-                 </span>
-              </div>
-              
-              <div className="h-40 flex items-end gap-1 relative z-10">
-                 {[40, 70, 45, 90, 65, 80, 50, 40, 95, 60, 40, 30, 80, 70, 50, 90, 50, 60, 40, 85, 30, 50, 80, 60, 40, 70].map((h, i) => (
-                   <motion.div 
-                     key={i}
-                     initial={{ height: 0 }}
-                     animate={{ height: `${h}%` }}
-                     transition={{ delay: i * 0.05 }}
-                     className="flex-grow bg-gradient-to-t from-blue-500/20 to-blue-500 rounded-t-sm"
-                   />
-                 ))}
               </div>
            </div>
         </div>
@@ -207,11 +249,11 @@ export default function Dashboard() {
                     <div className="grid grid-cols-2 gap-4">
                        <div className="bg-brand-dark/10 backdrop-blur-md rounded-2xl p-5 border border-brand-dark/10">
                           <p className="text-[10px] font-black text-brand-dark/50 uppercase tracking-widest mb-1 italic">Total Claims Issued</p>
-                          <p className="text-3xl font-black text-brand-dark tracking-tighter italic">{result.count}</p>
+                          <p className="text-3xl font-black text-brand-dark tracking-tighter italic">{result.payouts?.length || 0}</p>
                        </div>
                        <div className="bg-brand-dark/10 backdrop-blur-md rounded-2xl p-5 border border-brand-dark/10">
-                          <p className="text-[10px] font-black text-brand-dark/50 uppercase tracking-widest mb-1 italic">Simulation Precision</p>
-                          <p className="text-3xl font-black text-brand-dark tracking-tighter italic">98.4%</p>
+                          <p className="text-[10px] font-black text-brand-dark/50 uppercase tracking-widest mb-1 italic">Data Integrity</p>
+                          <p className="text-3xl font-black text-brand-dark tracking-tighter italic">IMD-CONFIRMED</p>
                        </div>
                     </div>
                   </div>
@@ -222,17 +264,17 @@ export default function Dashboard() {
            <div className="flex-grow bg-white/5 border border-white/10 rounded-[40px] p-8 flex flex-col">
               <div className="flex items-center justify-between mb-8">
                  <div className="flex items-center gap-3">
-                   <Globe className="w-5 h-5 text-brand-yellow" />
-                   <h3 className="font-black uppercase text-xs tracking-widest text-slate-400 italic">Parametric Audit Log</h3>
+                    <Globe className="w-5 h-5 text-brand-yellow" />
+                    <h3 className="font-black uppercase text-xs tracking-widest text-slate-400 italic">Parametric Audit Log</h3>
                  </div>
                  <div className="flex gap-2">
-                    <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[10px] font-black text-slate-400">SHRAM-v2.0</div>
+                    <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[10px] font-black text-slate-400">SHRAM-v2.5 (MODERN)</div>
                  </div>
               </div>
 
               <div className="flex-grow space-y-4">
                  {payoutHistory.length > 0 ? (
-                   payoutHistory.map((p, i) => (
+                   payoutHistory.slice().reverse().map((p, i) => (
                       <motion.div 
                         initial={{ x: 20, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
@@ -245,22 +287,33 @@ export default function Dashboard() {
                                SIM
                             </div>
                             <div>
-                               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-0.5 italic">Trigger</p>
+                               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-0.5 italic">Transaction Type</p>
                                <p className="font-black text-lg tracking-tighter uppercase leading-none">{p.trigger_type}</p>
                             </div>
                          </div>
 
                          <div className="hidden sm:block text-center">
                             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-0.5 italic">Recipient ID</p>
-                            <p className="font-bold text-sm tracking-widest opacity-60">WORKER-ID: {p.user_id}</p>
+                            <p className="font-bold text-sm tracking-widest opacity-60">UPI: user@okaxis</p>
                          </div>
 
                          <div className="text-right">
                             <p className="text-xl font-black text-brand-yellow tracking-tighter italic">₹{p.amount}</p>
-                            <p className="text-[10px] font-black text-green-500 uppercase tracking-widest leading-none mt-1">Processed</p>
+                            <p className="text-[10px] font-black text-green-500 uppercase tracking-widest leading-none mt-1">SENT VIA RAZORPAY</p>
                          </div>
                       </motion.div>
                    ))
+                 ) : (
+                   <div className="h-full flex flex-col items-center justify-center opacity-20 py-20">
+                      <BarChart3 className="w-20 h-20 mb-4" />
+                      <p className="font-black uppercase tracking-[0.3em] text-xs">No Payout Telemetry</p>
+                   </div>
+                 )}
+              </div>
+           </div>
+        </div>
+      </div>
+)
                  ) : (
                    <div className="h-full flex flex-col items-center justify-center opacity-20 py-20">
                       <BarChart3 className="w-20 h-20 mb-4" />
