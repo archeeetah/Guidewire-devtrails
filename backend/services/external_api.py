@@ -1,6 +1,11 @@
 import httpx
+import httpx_cache
 from datetime import datetime
 from core.config import settings
+
+# Initialize a cached HTTP client to protect our OpenWeatherMap API credits
+# Cache results for 600 seconds (10 minutes)
+client = httpx_cache.Client(cache=httpx_cache.DictCache(), timeout=5.0)
 
 class DisruptionAPIClient:
     """
@@ -12,6 +17,7 @@ class DisruptionAPIClient:
         """
         Calls OpenWeatherMap to get real-time Rain, Temperature, and AQI.
         Uses a 2-step process: Weather API (for coordinates) -> Pollution API (for AQI).
+        Results are cached for 10 minutes to prevent API abuse.
         """
         api_key = settings.OPENWEATHER_API_KEY
         
@@ -30,7 +36,7 @@ class DisruptionAPIClient:
         try:
             # Step 1: Get Weather and Coordinates
             weather_url = f"https://api.openweathermap.org/data/2.5/weather?q={zone}&appid={api_key}&units=metric"
-            weather_res = httpx.get(weather_url, timeout=5.0)
+            weather_res = client.get(weather_url)
             weather_data = weather_res.json()
 
             if weather_res.status_code != 200:
@@ -52,7 +58,7 @@ class DisruptionAPIClient:
 
             # Step 2: Get Air Quality (AQI)
             pollution_url = f"http://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={lon}&appid={api_key}"
-            pollution_res = httpx.get(pollution_url, timeout=5.0)
+            pollution_res = client.get(pollution_url)
             aqi = 100 # Default
             if pollution_res.status_code == 200:
                 pollution_data = pollution_res.json()
