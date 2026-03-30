@@ -2,37 +2,43 @@
 
 import { useState, useEffect } from "react";
 import { CloudLightning, MapPin, ShieldCheck, CheckCircle2, CloudRain, AlertCircle, Loader2 } from "lucide-react";
+import { motion } from "framer-motion"; // Assuming framer-motion is installed for motion.div
 
 export default function WorkerPortal() {
   const [user, setUser] = useState<any>(null);
   const [policies, setPolicies] = useState<any[]>([]);
   const [quote, setQuote] = useState<any>(null);
+  const [payouts, setPayouts] = useState<any[]>([]);
+  const [weather, setWeather] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
-  const [weatherLive, setWeatherLive] = useState<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       const phone = localStorage.getItem("worker_phone");
       if (!phone) {
-        window.location.href = "/login";
+        setLoading(false);
+        window.location.href = "/login"; // Keep the redirect
         return;
       }
 
       try {
-        // Fetch User
-        const userRes = await fetch(`http://localhost:8000/api/users/${phone}`);
-        if (!userRes.ok) throw new Error("User not found");
-        const userData = await userRes.json();
-        setUser(userData);
+        const [uRes, pRes, payRes] = await Promise.all([
+          fetch(`http://localhost:8000/api/users/profile/${phone}`),
+          fetch(`http://localhost:8000/api/policies/worker/${phone}`),
+          fetch(`http://localhost:8000/api/payouts/worker/${phone}`)
+        ]);
 
-        // Fetch Policies
-        const polRes = await fetch(`http://localhost:8000/api/policies/worker/${phone}`);
-        const polData = await polRes.json();
-        setPolicies(polData);
+        const userData = await uRes.json();
+        const policyData = await pRes.json();
+        const payoutData = await payRes.json();
+
+        setUser(userData);
+        setPolicies(policyData);
+        setPayouts(payoutData);
 
         // Fetch Quote if no policy
-        if (polData.length === 0) {
+        if (policyData.length === 0) {
           const qRes = await fetch("http://localhost:8000/api/policies/quote", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -43,7 +49,7 @@ export default function WorkerPortal() {
 
         // Fetch Live Weather explicitly for the UI Risk Radar
         const weatherRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${userData.primary_zone}&appid=50ac3262efa601768ceef39ca51d7e47&units=metric`);
-        if (weatherRes.ok) setWeatherLive(await weatherRes.json());
+        if (weatherRes.ok) setWeather(await weatherRes.json());
 
       } catch (e) {
         console.error("Portal error:", e);
@@ -100,17 +106,41 @@ export default function WorkerPortal() {
 
         <div className="flex-grow p-4 sm:p-6 space-y-4 sm:space-y-6 z-10 -mt-4 relative pt-10">
 
+          {/* Recent Payout Notification */}
+          {payouts.length > 0 && (
+             <motion.div 
+               initial={{ scale: 0.9, opacity: 0 }}
+               animate={{ scale: 1, opacity: 1 }}
+               className="bg-brand-yellow rounded-2xl p-5 border border-brand-yellow shadow-xl shadow-brand-yellow/20 relative overflow-hidden"
+             >
+                <div className="absolute top-0 right-0 p-2 opacity-10">
+                   <ShieldCheck className="w-16 h-16" />
+                </div>
+                <div className="flex items-center gap-3 mb-3">
+                   <div className="w-8 h-8 bg-brand-slate text-white rounded-full flex items-center justify-center">
+                     <CheckCircle2 className="w-5 h-5" />
+                   </div>
+                   <h3 className="font-black text-brand-slate">Parametric Payout Success!</h3>
+                </div>
+                <p className="text-sm font-bold text-brand-slate/80 mb-4">Our AI detected {payouts[0].trigger_type} in your area. ₹{payouts[0].amount} has been auto-transferred to your UPI.</p>
+                <div className="bg-white/50 rounded-xl p-3 flex justify-between items-center">
+                   <span className="text-xs font-black uppercase text-brand-slate opacity-50 tracking-tighter">Transaction #{payouts[0].id}</span>
+                   <span className="text-sm font-black text-brand-slate">₹{payouts[0].amount} Received</span>
+                </div>
+             </motion.div>
+          )}
+
           {/* Dynamic Risk Radar */}
           <div className="bg-white rounded-2xl sm:rounded-[24px] border border-slate-100 shadow-sm p-4 sm:p-5 flex items-center justify-between">
              <div>
                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Live Risk Radar</p>
                <h3 className="font-black text-lg text-brand-slate">
-                 {weatherLive ? weatherLive.weather[0].main : "Clear Skies"}
+                 {weather ? weather.weather[0].main : "Clear Skies"}
                </h3>
-               <p className="font-bold text-sm text-slate-500">{weatherLive ? `${weatherLive.main.temp}°C` : "--"}</p>
+               <p className="font-bold text-sm text-slate-500">{weather ? `${weather.main.temp}°C` : "--"}</p>
              </div>
              <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center">
-                 {weatherLive?.weather[0].main === "Rain" ? <CloudRain className="w-8 h-8 text-blue-500" /> : <CloudLightning className="w-8 h-8 text-yellow-500" />}
+                 {weather?.weather[0].main === "Rain" ? <CloudRain className="w-8 h-8 text-blue-500" /> : <CloudLightning className="w-8 h-8 text-yellow-500" />}
              </div>
           </div>
 

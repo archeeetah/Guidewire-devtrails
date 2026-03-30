@@ -2,6 +2,9 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
 }
 
 :root {
@@ -10,6 +13,10 @@ html {
   --brand-yellow: #facc15;
   --brand-slate: #1e293b;
   --accent-soft: #f8fafc;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
 }
 
 @theme inline {
@@ -27,4 +34,84 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-y: contain;
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+}
+
+/* ========== LOW-END DEVICE OPTIMIZATION ========== */
+
+/* Disable all animations & transitions for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* GPU compositing hints for smooth scrolling on weak devices */
+.gpu-layer {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* ========== MOBILE TOUCH TARGETS ========== */
+/* All interactive elements get a minimum 44x44 touch target (WCAG 2.5.5) */
+button, a, input, select, textarea, [role="button"] {
+  min-height: 44px;
+}
+
+/* Prevent iOS zoom on input focus */
+input, select, textarea {
+  font-size: 16px !important;
+}
+
+@media (min-width: 640px) {
+  input, select, textarea {
+    font-size: inherit !important;
+  }
+}
+
+/* ========== MOBILE SCROLLBAR ========== */
+/* Thin scrollbars on mobile */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.15) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: 4px;
+}
+
+/* ========== SAFE AREA & VIEWPORT FIX ========== */
+/* Fix for mobile viewport height (accounts for browser chrome) */
+@supports (height: 100dvh) {
+  .min-h-screen {
+    min-height: 100dvh !important;
+  }
+  .h-screen {
+    height: 100dvh !important;
+  }
+}
+
+/* ========== PERFORMANCE: CONTAIN PAINT ========== */
+.contain-paint {
+  contain: paint;
+}
+
+/* Fix overflow on mobile */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
 }

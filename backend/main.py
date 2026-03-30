@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from core.database import Base, engine
-from models import user, policy
-from api.routes import policies, triggers, users
+from models.user import User
+from models.policy import Policy
+from models.payout import Payout
+from api.routes import policies, triggers, users, payouts
 
 # Initialize DB models
 Base.metadata.create_all(bind=engine)
@@ -25,6 +27,7 @@ app.add_middleware(
 app.include_router(policies.router, prefix="/api")
 app.include_router(triggers.router, prefix="/api")
 app.include_router(users.router, prefix="/api")
+app.include_router(payouts.router, prefix="/api")
 
 @app.get("/")
 def read_root():

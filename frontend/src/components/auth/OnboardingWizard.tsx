@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Utensils, Package, ShoppingCart, CheckCircle2, ShieldCheck, Loader2, UploadCloud, ScanSearch } from "lucide-react";
 
 export default function OnboardingWizard() {

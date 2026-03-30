@@ -49,3 +49,15 @@ class PolicyResponse(BaseModel):
     
     class Config:
         from_attributes = True
+
+class PayoutResponse(BaseModel):
+    id: int
+    policy_id: int
+    user_id: int
+    amount: float
+    trigger_type: str
+    trigger_reason: str
+    processed_at: datetime
+
+    class Config:
+        from_attributes = True

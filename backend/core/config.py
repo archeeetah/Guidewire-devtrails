@@ -1,4 +1,12 @@
 import os
+from dotenv import load_dotenv
+
+# Load local .env file
+load_dotenv()
+from dotenv import load_dotenv
+
+# Load local .env file
+load_dotenv()
 
 class Settings:
     PROJECT_NAME: str = "ShramShield API"

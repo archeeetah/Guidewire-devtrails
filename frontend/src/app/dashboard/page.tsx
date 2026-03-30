@@ -9,6 +9,17 @@ export default function DashboardPage() {
   const [simulationParams, setSimulationParams] = useState({ zone: "Andheri" });
   const [isSimulating, setIsSimulating] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [payoutHistory, setPayoutHistory] = useState<any[]>([]);
+
+  const fetchPayoutHistory = async () => {
+    try {
+      const res = await fetch("http://localhost:8000/api/payouts/");
+      const data = await res.json();
+      setPayoutHistory(data);
+    } catch (err) {
+      console.error("Failed to fetch payout history", err);
+    }
+  };
 
   const handleSimulate = async () => {
     setIsSimulating(true);
@@ -21,11 +32,17 @@ export default function DashboardPage() {
       });
       const data = await res.json();
       setResult(data);
+      fetchPayoutHistory(); // Refresh history after simulation
     } catch (err) {
       console.error(err);
     }
     setIsSimulating(false);
   };
+
+  // Initial fetch
+  useState(() => {
+    fetchPayoutHistory();
+  });
 
   return (
     <main className="min-h-screen bg-slate-50 text-brand-slate selection:bg-brand-yellow selection:text-brand-dark flex flex-col">
@@ -156,6 +173,53 @@ export default function DashboardPage() {
               )}
             </AnimatePresence>
           </div>
+        </div>
+
+        {/* Global Audit Log */}
+        <div className="w-full max-w-4xl mt-12 bg-white rounded-[32px] p-8 border border-slate-100 shadow-sm">
+           <div className="flex justify-between items-center mb-8">
+              <h2 className="text-2xl font-black flex items-center gap-3 text-brand-slate">
+                 <CheckCircle2 className="text-green-500" /> Automated Audit Log
+              </h2>
+              <div className="px-3 py-1 bg-green-50 text-green-600 rounded-full text-xs font-black uppercase tracking-widest border border-green-100">
+                 Real-Time Ledger
+              </div>
+           </div>
+
+           {payoutHistory.length === 0 ? (
+             <div className="text-center py-12 text-slate-400 font-bold border-2 border-dashed border-slate-50 rounded-2xl">
+                No recent transactions processed.
+             </div>
+           ) : (
+             <div className="overflow-x-auto">
+               <table className="w-full text-left">
+                  <thead>
+                    <tr className="text-xs font-black uppercase text-slate-400 tracking-widest border-b border-slate-50">
+                      <th className="pb-4">Timestamp</th>
+                      <th className="pb-4">Policy</th>
+                      <th className="pb-4">Trigger</th>
+                      <th className="pb-4">Reason</th>
+                      <th className="pb-4 text-right">Payout</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50">
+                    {payoutHistory.map((p, i) => (
+                      <tr key={i} className="text-sm font-bold text-brand-slate hover:bg-slate-50 transition-colors">
+                        <td className="py-4 text-slate-400">{new Date(p.processed_at).toLocaleTimeString()}</td>
+                        <td className="py-4">#00{p.policy_id}</td>
+                        <td className="py-4">
+                           <span className="px-2 py-1 bg-brand-yellow/10 text-brand-slate rounded text-[10px] border border-brand-yellow/20">
+                             {p.trigger_type}
+                           </span>
+                        </td>
+                        <td className="py-4 text-slate-500 font-medium">{p.trigger_reason}</td>
+                        <td className="py-4 text-right font-black text-green-600">+₹{p.amount}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+               </table>
+             </div>
+           )}
         </div>
       </div>
     </main>
