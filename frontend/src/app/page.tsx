@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import PersonaCard from "@/components/PersonaCard";
 import ProtectionModal from "@/components/ProtectionModal";
@@ -74,6 +75,7 @@ export default function Home() {
         onClose={() => setSelectedPersona(null)}
         platform={selectedPersona || ""}
       />
+      <Footer />
     </main>
   );
 }

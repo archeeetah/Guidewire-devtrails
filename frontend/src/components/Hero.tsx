@@ -15,16 +15,6 @@ export default function Hero() {
       <div className="container px-6 mx-auto relative z-10 text-slate-900">
         <div className="max-w-4xl mx-auto text-center mb-24">
           
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm mb-8"
-          >
-             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-             <span className="text-xs font-semibold text-slate-600 tracking-wide uppercase">Live Parametric Network</span>
-          </motion.div>
-
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

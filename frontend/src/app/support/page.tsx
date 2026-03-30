@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Plus, Minus, MessageSquare, Phone, 
@@ -176,6 +177,7 @@ export default function SupportPage() {
            </div>
         </div>
       </div>
+      <Footer />
     </main>
   );
 }

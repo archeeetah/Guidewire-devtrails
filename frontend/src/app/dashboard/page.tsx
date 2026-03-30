@@ -7,8 +7,31 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { Lock } from "lucide-react";
 
 export default function Dashboard() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [adminPass, setAdminPass] = useState("");
+  const [authError, setAuthError] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("shramshield_admin") === "true") {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleAdminLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (adminPass === "shramadmin") { // simple mocked password
+      localStorage.setItem("shramshield_admin", "true");
+      setIsAuthenticated(true);
+      setAuthError(false);
+    } else {
+      setAuthError(true);
+      setAdminPass("");
+    }
+  };
+
   const [adminStats, setAdminStats] = useState<any>(null);
   const [payoutHistory, setPayoutHistory] = useState<any[]>([]);
   const [isSimulating, setIsSimulating] = useState(false);
@@ -100,6 +123,55 @@ export default function Dashboard() {
     const interval = setInterval(fetchAdminStats, 10000);
     return () => clearInterval(interval);
   }, []);
+
+  if (!isAuthenticated) {
+    return (
+      <main className="min-h-screen bg-slate-50 flex items-center justify-center p-6 font-sans">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white p-8 sm:p-12 rounded-2xl shadow-xl max-w-md w-full border border-slate-200"
+        >
+          <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-md shadow-blue-600/20 mb-8 mx-auto">
+            <Lock className="text-white w-6 h-6" />
+          </div>
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900 text-center mb-2">Admin Access</h2>
+          <p className="text-slate-500 text-sm font-medium text-center mb-8">
+             Enter verification phrase to access core telemetry and override protocols.
+          </p>
+
+          <form onSubmit={handleAdminLogin} className="space-y-6">
+            <div>
+               <label className="block text-xs font-semibold uppercase tracking-widest text-slate-500 mb-2">
+                 Access Token
+               </label>
+               <input 
+                 type="password"
+                 value={adminPass}
+                 onChange={(e) => setAdminPass(e.target.value)}
+                 className={`w-full bg-slate-50 border ${authError ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-blue-500'} rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-transparent focus:ring-2 transition-all text-slate-900`}
+                 placeholder="Enter admin token..."
+               />
+               {authError && <p className="text-red-500 text-xs mt-2 font-medium">Invalid access token. Command override denied.</p>}
+            </div>
+
+            <button 
+              type="submit"
+              className="w-full bg-slate-900 text-white font-semibold py-3.5 rounded-xl hover:bg-slate-800 transition-colors shadow-sm"
+            >
+              Verify Identity
+            </button>
+          </form>
+
+          <div className="mt-8 text-center border-t border-slate-100 pt-6">
+             <a href="/" className="text-sm font-medium text-blue-600 hover:text-blue-500 transition-colors">
+                &larr; Return to Homepage
+             </a>
+          </div>
+        </motion.div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-800 p-6 sm:p-10 font-sans selection:bg-blue-100 selection:text-blue-900">

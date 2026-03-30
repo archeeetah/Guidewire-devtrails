@@ -1,6 +1,7 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
 import { Check, Zap, Shield, Crown } from "lucide-react";
 
@@ -165,6 +166,7 @@ export default function PricingPage() {
           </a>
         </motion.div>
       </div>
+      <Footer />
     </main>
   );
 }

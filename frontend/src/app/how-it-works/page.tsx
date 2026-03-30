@@ -1,6 +1,7 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
 import { CloudLightning, Cpu, Smartphone, ShieldCheck, MapPin, Zap, ArrowRight, CheckCircle2 } from "lucide-react";
 
@@ -140,6 +141,7 @@ export default function HowItWorksPage() {
            </a>
         </motion.div>
       </div>
+      <Footer />
     </main>
   );
 }
