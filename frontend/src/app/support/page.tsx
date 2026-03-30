@@ -35,129 +35,142 @@ export default function SupportPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <main className="min-h-screen bg-white text-brand-slate selection:bg-brand-yellow selection:text-brand-dark pb-24 font-sans">
+    <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-blue-100 selection:text-blue-900 pb-24 font-sans">
       <Navbar />
       
-      <div className="container mx-auto px-6 pt-24 sm:pt-32">
-        <div className="max-w-4xl mx-auto text-center mb-24">
+      <div className="container mx-auto px-6 pt-24 sm:pt-32 max-w-7xl">
+        <div className="max-w-3xl mx-auto text-center mb-24">
           <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full bg-slate-100 text-slate-500 text-xs font-black uppercase tracking-[0.2em]"
+            className="inline-flex items-center gap-2 px-3 py-1.5 mb-6 rounded-full bg-white border border-slate-200 shadow-sm"
           >
-             Global Infrastructure Support
+             <span className="text-xs font-semibold text-slate-600 tracking-wide uppercase">Global Infrastructure Support</span>
           </motion.div>
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl sm:text-7xl font-black tracking-tighter mb-8 leading-[0.9] italic"
+            className="text-5xl sm:text-6xl font-bold tracking-tight mb-6 leading-tight"
           >
-            We've Got Your <span className="text-brand-yellow">Back.</span>
+            We've Got Your <span className="text-blue-600">Back.</span>
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-lg sm:text-2xl text-slate-500 font-bold max-w-xl mx-auto leading-tight"
+            className="text-lg sm:text-xl text-slate-500 font-medium max-w-xl mx-auto leading-relaxed"
           >
-             Need help with your policy or payouts? Our multi-channel support team is available 24/7.
+             Need help with your coverage or payouts? Our multi-channel support team is available 24/7.
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 max-w-7xl mx-auto items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 max-w-6xl mx-auto items-start">
            
            {/* FAQ Section */}
-           <div className="lg:col-span-7 space-y-4">
-              <div className="flex items-center gap-3 mb-12">
-                 <HelpCircle className="w-6 h-6 text-brand-yellow" />
-                 <h2 className="text-2xl font-black italic uppercase tracking-tighter">Frequently Asked</h2>
+           <div className="lg:col-span-7 flex flex-col gap-4">
+              <div className="flex items-center gap-3 mb-6">
+                 <div className="p-2 bg-slate-100 rounded-lg">
+                    <HelpCircle className="w-5 h-5 text-slate-600" />
+                 </div>
+                 <h2 className="text-xl font-bold tracking-tight text-slate-800">Frequently Asked Questions</h2>
               </div>
               
-              {FAQS.map((faq, i) => (
-                <motion.div 
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  className={`rounded-[32px] overflow-hidden border transition-all ${openIndex === i ? 'bg-slate-50 border-brand-yellow/30 shadow-xl' : 'bg-white border-slate-100 hover:border-slate-300'}`}
-                >
-                  <button 
-                    onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                    className="w-full p-8 flex items-center justify-between text-left group"
-                  >
-                     <span className="text-lg font-black tracking-tight italic transition-colors">{faq.question}</span>
-                     {openIndex === i ? <Minus className="w-5 h-5 text-brand-yellow" /> : <Plus className="w-5 h-5 text-slate-300" />}
-                  </button>
-                  <AnimatePresence>
-                     {openIndex === i && (
-                       <motion.div 
-                         initial={{ height: 0, opacity: 0 }}
-                         animate={{ height: "auto", opacity: 1 }}
-                         exit={{ height: 0, opacity: 0 }}
-                         transition={{ duration: 0.3 }}
-                       >
-                          <div className="px-8 pb-8 text-slate-500 font-bold leading-tight max-w-2xl">
-                             {faq.answer}
-                          </div>
-                       </motion.div>
-                     )}
-                  </AnimatePresence>
-                </motion.div>
-              ))}
+              <div className="space-y-4">
+                 {FAQS.map((faq, i) => (
+                   <motion.div 
+                     key={i}
+                     initial={{ opacity: 0, y: 10 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     transition={{ delay: i * 0.1 }}
+                     className={`rounded-2xl overflow-hidden border transition-all ${openIndex === i ? 'bg-white border-blue-200 shadow-md' : 'bg-white border-slate-200 shadow-sm hover:border-slate-300 hover:shadow-md'}`}
+                   >
+                     <button 
+                       onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                       className="w-full p-6 flex items-center justify-between text-left group focus:outline-none"
+                     >
+                        <span className="text-lg font-semibold tracking-tight text-slate-800 group-hover:text-blue-600 transition-colors pr-8">{faq.question}</span>
+                        <div className={`p-2 rounded-full flex items-center justify-center transition-colors ${openIndex === i ? 'bg-blue-50' : 'bg-slate-50 group-hover:bg-slate-100'}`}>
+                           {openIndex === i ? <Minus className="w-4 h-4 text-blue-600" /> : <Plus className="w-4 h-4 text-slate-400" />}
+                        </div>
+                     </button>
+                     <AnimatePresence>
+                        {openIndex === i && (
+                          <motion.div 
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.2, ease: "easeInOut" }}
+                          >
+                             <div className="px-6 pb-6 text-slate-500 font-medium leading-relaxed max-w-2xl border-t border-slate-50 pt-4">
+                                {faq.answer}
+                             </div>
+                          </motion.div>
+                        )}
+                     </AnimatePresence>
+                   </motion.div>
+                 ))}
+              </div>
            </div>
 
            {/* Contact Sidebar */}
-           <div className="lg:col-span-5 space-y-8 sticky top-32">
-              <div className="p-10 rounded-[48px] bg-brand-slate text-white shadow-2xl relative overflow-hidden group">
-                 <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-125 transition-transform rotate-12">
-                    <MessageSquare className="w-32 h-32 text-brand-yellow" />
+           <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-32">
+              <div className="p-8 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-xl relative overflow-hidden group">
+                 <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform pointer-events-none">
+                    <MessageSquare className="w-32 h-32 text-blue-400" />
                  </div>
-                 <h3 className="text-2xl font-black mb-8 italic uppercase tracking-tighter text-brand-yellow relative z-10">Direct Support</h3>
                  
-                 <div className="space-y-6 relative z-10">
-                    <a href="https://wa.me/919123456789" className="flex items-center gap-4 bg-white/5 p-5 rounded-3xl border border-white/5 hover:bg-white/10 transition-all group/item cursor-pointer">
-                       <div className="p-3 bg-brand-yellow rounded-2xl">
-                          <MessageSquare className="w-5 h-5 text-brand-dark" />
+                 <div className="flex items-center gap-3 mb-8 relative z-10">
+                    <div className="p-2 bg-slate-800 rounded-lg border border-slate-700">
+                       <MessageSquare className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <h3 className="text-xl font-bold tracking-tight text-white">Direct Support</h3>
+                 </div>
+                 
+                 <div className="space-y-4 relative z-10">
+                    <a href="https://wa.me/919123456789" className="flex items-center gap-4 bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50 hover:bg-slate-800 transition-all group/item cursor-pointer">
+                       <div className="p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20 group-hover:bg-emerald-500/20 transition-colors">
+                          <MessageSquare className="w-5 h-5 text-emerald-400" />
                        </div>
                        <div>
-                          <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest leading-none mb-1">WhatsApp Live</p>
-                          <p className="text-lg font-black italic tracking-tighter hover:text-brand-yellow transition-colors underline decoration-dotted">+91 91234 56789</p>
+                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-0.5">WhatsApp Live</p>
+                          <p className="text-base font-bold tracking-tight group-hover:text-emerald-400 transition-colors">+91 91234 56789</p>
                        </div>
                     </a>
 
-                    <a href="mailto:help@shramshield.in" className="flex items-center gap-4 bg-white/5 p-5 rounded-3xl border border-white/5 hover:bg-white/10 transition-all group/item cursor-pointer">
-                       <div className="p-3 bg-white/10 rounded-2xl">
-                          <Mail className="w-5 h-5 text-white" />
+                    <a href="mailto:help@shramshield.in" className="flex items-center gap-4 bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50 hover:bg-slate-800 transition-all group/item cursor-pointer">
+                       <div className="p-3 bg-blue-500/10 rounded-xl border border-blue-500/20 group-hover:bg-blue-500/20 transition-colors">
+                          <Mail className="w-5 h-5 text-blue-400" />
                        </div>
                        <div>
-                          <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest leading-none mb-1">Email Support</p>
-                          <p className="text-lg font-black italic tracking-tighter hover:text-brand-yellow transition-colors underline decoration-dotted">help@shramshield.in</p>
+                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-0.5">Email Support</p>
+                          <p className="text-base font-bold tracking-tight group-hover:text-blue-400 transition-colors">help@shramshield.in</p>
                        </div>
                     </a>
 
-                    <a href="tel:1800-SHRAM-HELP" className="flex items-center gap-4 bg-white/5 p-5 rounded-3xl border border-white/5 hover:bg-white/10 transition-all group/item cursor-pointer">
-                       <div className="p-3 bg-white/10 rounded-2xl">
-                          <Phone className="w-5 h-5 text-white" />
+                    <a href="tel:1800-SHRAM-HELP" className="flex items-center gap-4 bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50 hover:bg-slate-800 transition-all group/item cursor-pointer">
+                       <div className="p-3 bg-purple-500/10 rounded-xl border border-purple-500/20 group-hover:bg-purple-500/20 transition-colors">
+                          <Phone className="w-5 h-5 text-purple-400" />
                        </div>
                        <div>
-                          <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest leading-none mb-1">24/7 Helpline</p>
-                          <p className="text-lg font-black italic tracking-tighter hover:text-brand-yellow transition-colors underline decoration-dotted">1800-SHRAM-HELP</p>
+                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-0.5">24/7 Helpline</p>
+                          <p className="text-base font-bold tracking-tight group-hover:text-purple-400 transition-colors">1800-SHRAM-HELP</p>
                        </div>
                     </a>
                  </div>
               </div>
 
-              {/* System Status Link */}
-              <a href="/dashboard" className="p-10 rounded-[48px] bg-slate-50 border border-slate-100 flex flex-col items-center text-center group active:scale-95 transition-all cursor-pointer">
-                 <div className="w-16 h-16 bg-white rounded-3xl shadow-lg border border-slate-100 mb-6 flex items-center justify-center relative overflow-hidden">
-                    <div className="absolute inset-0 bg-emerald-500/10 animate-pulse" />
-                    <Globe className="w-6 h-6 text-emerald-500 relative z-10" />
+              {/* System Status Block */}
+              <a href="/dashboard" className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between group cursor-pointer block">
+                 <div>
+                    <h4 className="text-lg font-bold tracking-tight text-slate-800 mb-1">System Status</h4>
+                    <p className="text-xs font-medium text-slate-500">Live IMD Sync & Telemetry</p>
                  </div>
-                 <h4 className="text-xl font-black italic uppercase tracking-tighter mb-2">System Telemetry</h4>
-                 <p className="text-xs font-bold text-slate-400 max-w-[200px] mb-6">Real-time IMD Sync and Sensor Network status.</p>
-                 <div className="px-6 py-2 bg-white border border-slate-100 rounded-full flex items-center gap-2 group-hover:border-brand-yellow transition-all">
-                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">All Systems Optimal</span>
+                 <div className="flex items-center gap-3">
+                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-600">Optimal</span>
+                    <div className="relative flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </div>
                  </div>
               </a>
            </div>

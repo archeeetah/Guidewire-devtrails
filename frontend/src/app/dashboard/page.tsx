@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import { 
-  Zap, CloudRain, Wind, AlertCircle, History, 
-  Terminal, Activity, ShieldAlert, Cpu, Globe, 
-  BarChart3, Settings, Play, RefreshCw, Layers, Loader2, Bell
+  Zap, AlertCircle, Terminal, ShieldAlert, Globe, 
+  BarChart3, Settings, Play, RefreshCw, Layers, Loader2, Bell, CheckCircle2, CloudRain
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -28,7 +27,6 @@ export default function Dashboard() {
       const data = await res.json();
       setAdminStats(data);
 
-      // Handle Live Notifications Toasts
       if (data.notifications && data.notifications.length > 0) {
         const latest = data.notifications[0];
         if (latest.id !== lastAlertId.current) {
@@ -99,47 +97,40 @@ export default function Dashboard() {
   useEffect(() => {
     fetchPayoutHistory();
     fetchAdminStats();
-    const interval = setInterval(fetchAdminStats, 10000); // 10s auto-refresh
+    const interval = setInterval(fetchAdminStats, 10000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <main className="min-h-screen bg-brand-slate text-white selection:bg-brand-yellow selection:text-brand-dark p-6 sm:p-10 font-sans">
+    <main className="min-h-screen bg-slate-50 text-slate-800 p-6 sm:p-10 font-sans selection:bg-blue-100 selection:text-blue-900">
       
-      {/* HUD Header */}
-      <header className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-16 relative">
-         <div className="absolute top-[-100px] left-[-100px] w-64 h-64 bg-brand-yellow/5 rounded-full blur-[120px] pointer-events-none" />
-         
-         <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-2">
-               <div className="p-2 bg-brand-yellow rounded-xl shadow-[0_0_20px_rgba(250,204,21,0.2)]">
-                  <Terminal className="w-6 h-6 text-brand-dark" />
-               </div>
-               <h1 className="text-sm font-black uppercase tracking-[0.4em] text-brand-yellow">Emergency Command Center</h1>
+      {/* Header Area */}
+      <header className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+         <div>
+            <div className="flex items-center gap-2 mb-2">
+               <ShieldAlert className="w-5 h-5 text-blue-600" />
+               <span className="text-sm font-semibold tracking-wide text-blue-600 uppercase">Admin Dashboard</span>
             </div>
-            <h2 className="text-4xl font-black tracking-tighter leading-tight italic">AI Parametric System Dashboard</h2>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Parametric System Overview</h1>
          </div>
 
-         <div className="flex items-center gap-4 relative z-10">
-            <div className="hidden sm:flex flex-col items-end">
-               <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-1">Telemetry Status</p>
-               <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black text-blue-400">AUTHORITATIVE</span>
-                  <div className="flex gap-1">
-                     {[1, 2, 3, 4, 5].map(i => <div key={i} className="w-3 h-1.5 bg-blue-500 rounded-sm" />)}
-                  </div>
+         <div className="flex items-center gap-3">
+            <div className="hidden sm:flex flex-col items-end mr-4">
+               <span className="text-xs font-medium text-slate-500 uppercase tracking-widest">System Status</span>
+               <div className="flex items-center gap-2 mt-1">
+                  <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                  <span className="text-xs font-bold text-slate-700">All Operations Normal</span>
                </div>
             </div>
-            <div className="h-10 w-px bg-white/10 hidden sm:block" />
             
             <div className="relative">
                <button 
                   onClick={() => setShowNotifications(!showNotifications)}
-                  className="p-3 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all hover:scale-105 active:scale-95 relative"
+                  className="p-2.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors relative shadow-sm"
                >
-                  <Bell className="w-5 h-5 text-slate-400" />
+                  <Bell className="w-5 h-5 text-slate-600" />
                   {adminStats?.notifications?.length > 0 && (
-                    <span className="absolute top-2 right-2 w-2 h-2 bg-brand-yellow rounded-full animate-pulse shadow-[0_0_8px_rgba(250,204,21,0.8)]" />
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full shadow-sm" />
                   )}
                </button>
 
@@ -149,17 +140,17 @@ export default function Dashboard() {
                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
                      animate={{ opacity: 1, y: 0, scale: 1 }}
                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                     className="absolute right-0 mt-4 w-80 bg-brand-slate/90 backdrop-blur-2xl border border-white/10 rounded-[24px] shadow-2xl p-6 z-[100]"
+                     className="absolute right-0 mt-3 w-80 bg-white border border-slate-200 rounded-xl shadow-xl p-5 z-[100]"
                    >
-                     <h4 className="font-black text-[10px] uppercase tracking-[0.3em] text-slate-500 mb-4 px-1">Recent Alerts</h4>
-                     <div className="space-y-4 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar">
+                     <h4 className="font-semibold text-xs uppercase tracking-wide text-slate-500 mb-4 px-1">Recent Alerts</h4>
+                     <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1">
                         {adminStats?.notifications?.map((n: any) => (
-                          <div key={n.id} className="group relative pr-8">
+                          <div key={n.id} className="group relative">
                              <div className="flex items-start gap-3">
-                                <div className={`mt-1 w-2 h-2 rounded-full ${n.type === 'PAYOUT_ISSUED' ? 'bg-brand-yellow' : 'bg-blue-500'}`} />
+                                <div className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${n.type === 'PAYOUT_ISSUED' ? 'bg-emerald-500' : 'bg-blue-500'}`} />
                                 <div>
-                                   <p className="font-black text-xs uppercase tracking-tight">{n.title}</p>
-                                   <p className="text-[10px] text-slate-400 font-bold leading-tight">{n.message}</p>
+                                   <p className="font-semibold text-sm text-slate-800">{n.title}</p>
+                                   <p className="text-xs text-slate-500 mt-1 leading-relaxed">{n.message}</p>
                                 </div>
                              </div>
                           </div>
@@ -172,238 +163,228 @@ export default function Dashboard() {
 
             <button 
                onClick={() => { fetchPayoutHistory(); fetchAdminStats(); }}
-               className="p-3 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all hover:scale-105 active:scale-95"
+               className="p-2.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors shadow-sm"
             >
-               <RefreshCw className="w-5 h-5 text-slate-400" />
+               <RefreshCw className="w-5 h-5 text-slate-600" />
             </button>
          </div>
       </header>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Simulator & Stats Panel */}
-        <div className="lg:col-span-5 space-y-8">
+        {/* Left Column */}
+        <div className="lg:col-span-1 space-y-6">
            
-           {/* Liquidity Tracker Card */}
-           <div className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[32px] p-8 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-6 opacity-5">
-                 <ShieldAlert className="w-24 h-24" />
-              </div>
-              <div className="flex items-center gap-3 mb-6 relative z-10">
-                 <Globe className="w-5 h-5 text-green-400" />
-                 <h3 className="font-black uppercase text-xs tracking-widest text-slate-400">Liquidity Pool Health</h3>
+           {/* Liquidity Tracking */}
+           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+              <div className="flex items-center gap-3 mb-6">
+                 <Globe className="w-5 h-5 text-slate-400" />
+                 <h3 className="font-semibold text-slate-700">Liquidity Health</h3>
               </div>
               
               {adminStats ? (
-                <div className="relative z-10">
-                   <div className="flex justify-between items-end mb-2">
-                      <p className="text-sm font-black text-slate-400 uppercase italic">Solvency Score</p>
-                      <p className="text-3xl font-black text-white italic tracking-tighter">{adminStats.liquidity.health_score}%</p>
+                <div>
+                   <div className="flex justify-between items-end mb-3">
+                      <p className="text-sm font-medium text-slate-500">Solvency Index</p>
+                      <p className="text-3xl font-bold tracking-tight text-slate-900">{adminStats.liquidity.health_score}%</p>
                    </div>
-                   <div className="w-full h-4 bg-white/5 rounded-full overflow-hidden mb-8 border border-white/10">
+                   <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden mb-8">
                       <motion.div 
                         initial={{ width: 0 }}
                         animate={{ width: `${adminStats.liquidity.health_score}%` }}
-                        className={`h-full ${adminStats.liquidity.health_score > 70 ? 'bg-green-500' : 'bg-brand-yellow'} shadow-[0_0_20px_rgba(34,197,94,0.3)]`}
+                        className={`h-full ${adminStats.liquidity.health_score > 70 ? 'bg-emerald-500' : 'bg-amber-500'}`}
                       />
                    </div>
                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                         <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">Total Reserves</p>
-                         <p className="font-black text-xl tracking-tighter italic text-slate-300">₹{(adminStats.liquidity.current_pool / 100000).toFixed(1)}L</p>
+                      <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                         <p className="text-xs font-medium text-slate-500 mb-1">Total Reserves</p>
+                         <p className="font-bold text-lg text-slate-800">₹{(adminStats.liquidity.current_pool / 100000).toFixed(1)}L</p>
                       </div>
-                      <div className="text-right">
-                         <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">Total Payouts</p>
-                         <p className="font-black text-xl tracking-tighter italic text-brand-yellow">₹{(adminStats.liquidity.total_payouts / 100000).toFixed(1)}L</p>
+                      <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                         <p className="text-xs font-medium text-slate-500 mb-1">Total Payouts</p>
+                         <p className="font-bold text-lg text-blue-600">₹{(adminStats.liquidity.total_payouts / 100000).toFixed(1)}L</p>
                       </div>
                    </div>
                 </div>
               ) : (
-                <div className="animate-pulse h-32 bg-white/5 rounded-2xl" />
+                <div className="animate-pulse h-32 bg-slate-100 rounded-xl" />
               )}
            </div>
 
-           {/* Heatmap Overview SIM */}
-           <div className="bg-white/5 border border-white/10 rounded-[32px] p-8 overflow-hidden relative group">
+           {/* Active Disruption Zones */}
+           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
               <div className="flex items-center gap-3 mb-6">
-                 <Layers className="w-5 h-5 text-brand-yellow" />
-                 <h3 className="font-black uppercase text-xs tracking-widest text-slate-400 italic font-medium">Disruption Zones</h3>
+                 <Layers className="w-5 h-5 text-slate-400" />
+                 <h3 className="font-semibold text-slate-700">Disruption Zones</h3>
               </div>
               
               <div className="space-y-4">
                  {adminStats?.heatmap && adminStats.heatmap.length > 0 ? (
                     adminStats.heatmap.slice(0, 4).map((zone: any, i: number) => (
                       <div key={i} className="flex items-center justify-between">
-                         <div className="flex items-center gap-3">
-                            <div className="w-2 h-2 rounded-full bg-brand-yellow animate-ping" />
-                            <p className="text-xs font-black uppercase text-slate-300">{zone.city}</p>
+                         <div className="flex items-center gap-3 w-1/3">
+                            <CloudRain className="w-4 h-4 text-slate-400" />
+                            <p className="text-sm font-semibold text-slate-700">{zone.city}</p>
                          </div>
-                         <div className="h-1 flex-grow mx-4 bg-white/5 rounded-full overflow-hidden">
-                            <div className="h-full bg-brand-yellow/50" style={{ width: `${Math.min(zone.claims * 10, 100)}%` }} />
+                         <div className="h-2 flex-grow mx-4 bg-slate-100 rounded-full overflow-hidden">
+                            <div className="h-full bg-blue-500" style={{ width: `${Math.min(zone.claims * 10, 100)}%` }} />
                          </div>
-                         <p className="text-xs font-black text-slate-500">{zone.claims} Claims</p>
+                         <p className="text-xs font-medium text-slate-500 w-16 text-right">{zone.claims} Claims</p>
                       </div>
                     ))
                  ) : (
-                    <div className="py-8 text-center opacity-20">
-                       <p className="text-[10px] font-black uppercase tracking-widest">No Active Breaches</p>
+                    <div className="py-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                       <p className="text-xs font-medium text-slate-500 uppercase tracking-widest">No Active Zones</p>
                     </div>
                  )}
               </div>
            </div>
+        </div>
 
-           <div className="bg-brand-slate/80 backdrop-blur-3xl border border-white/10 rounded-[32px] p-8 relative overflow-hidden group tech-border">
+        {/* Right Column */}
+        <div className="lg:col-span-2 flex flex-col gap-6">
+           
+           {/* Simulation Core */}
+           <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
               <div className="flex items-center gap-3 mb-8">
-                 <Settings className="w-5 h-5 text-brand-yellow" />
-                 <h3 className="font-black uppercase text-xs tracking-widest text-slate-400">Simulation Configuration</h3>
+                 <Settings className="w-5 h-5 text-slate-400" />
+                 <h3 className="font-semibold text-slate-700 text-lg">System Trigger Simulation</h3>
               </div>
 
-              <div className="space-y-6 relative z-10">
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] px-2 italic">Disruption Type</label>
-                    <div className="grid grid-cols-3 gap-2">
-                       {["Flood", "Cyclone", "Curfew"].map(type => (
-                         <button 
-                           key={type}
-                           onClick={() => setSimulationParams(p => ({...p, trigger_type: type}))}
-                           className={`py-3 rounded-[12px] font-black text-[10px] uppercase tracking-widest border transition-all ${simulationParams.trigger_type === type ? 'bg-brand-yellow text-brand-dark border-brand-yellow shadow-[0_0_15px_rgba(250,204,21,0.3)]' : 'bg-white/5 text-slate-400 border-white/5 hover:border-white/20'}`}
-                         >
-                           {type}
-                         </button>
-                       ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                 
+                 <div className="space-y-6">
+                    <div>
+                       <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Event Type</label>
+                       <div className="flex gap-2">
+                          {["Flood", "Cyclone", "Curfew"].map(type => (
+                            <button 
+                              key={type}
+                              onClick={() => setSimulationParams(p => ({...p, trigger_type: type}))}
+                              className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all border ${simulationParams.trigger_type === type ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}`}
+                            >
+                              {type}
+                            </button>
+                          ))}
+                       </div>
+                    </div>
+
+                    <div>
+                       <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Target Region</label>
+                       <input 
+                         type="text"
+                         placeholder="e.g. Mumbai, Delhi NCR"
+                         value={simulationParams.zone}
+                         onChange={(e) => setSimulationParams(p => ({...p, zone: e.target.value}))}
+                         className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-medium outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all placeholder:text-slate-400"
+                       />
                     </div>
                  </div>
 
-
-
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] px-2 italic">Target Geo-Zone</label>
-                    <input 
-                      type="text"
-                      placeholder="e.g. Mumbai, Navi Mumbai..."
-                      value={simulationParams.zone}
-                      onChange={(e) => setSimulationParams(p => ({...p, zone: e.target.value}))}
-                      className="w-full bg-white/5 border border-white/10 rounded-[16px] p-4 font-black text-xs tracking-widest uppercase outline-none focus:border-brand-yellow transition-all placeholder:text-slate-600"
-                    />
+                 <div className="flex flex-col justify-end">
+                     <button 
+                       onClick={handleSimulate}
+                       disabled={isSimulating}
+                       className="w-full py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-500 transition-all disabled:opacity-50 flex items-center justify-center gap-3 shadow-md"
+                     >
+                        {isSimulating ? (
+                          <><Loader2 className="w-5 h-5 animate-spin" /> Processing Trigger...</>
+                        ) : (
+                          <><Play className="w-5 h-5 fill-current" /> Execute Simulation</>
+                        )}
+                     </button>
                  </div>
-
-                 <button 
-                   onClick={handleSimulate}
-                   disabled={isSimulating}
-                   className="w-full py-5 bg-brand-yellow text-brand-dark font-black rounded-[16px] hover:bg-white transition-all shadow-[0_0_30px_rgba(250,204,21,0.2)] disabled:opacity-50 flex items-center justify-center gap-3 text-sm tracking-widest uppercase active:scale-[0.98]"
-                 >
-                    {isSimulating ? (
-                      <><Loader2 className="w-5 h-5 animate-spin" /> VERIFYING...</>
-                    ) : (
-                      <><Play className="w-4 h-4 fill-current" /> EXECUTE TRIGGER</>
-                    )}
-                 </button>
+                 
               </div>
            </div>
-        </div>
 
-        {/* Audit Log / Payout History */}
-        <div className="lg:col-span-7 flex flex-col gap-8">
-           
-           {/* Simulation Result Overlay */}
+           {/* Results Overlay */}
            {result && (
-              <div className="bg-brand-yellow/10 backdrop-blur-md rounded-[32px] p-8 border border-brand-yellow tech-border relative overflow-hidden">
-                 <div className="absolute top-0 right-0 p-8 opacity-10">
-                    <ShieldAlert className="w-32 h-32 text-brand-yellow" />
-                 </div>
-                 <div className="relative z-10">
-                   <h4 className="font-black text-brand-yellow uppercase text-[10px] tracking-[0.3em] mb-4">Simulation Result</h4>
-                   <p className="text-white font-black text-2xl italic tracking-tight mb-8">
-                     {result.message}
-                   </p>
-                   
-                   <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-black/20 rounded-[16px] p-5 border border-white/5">
-                         <p className="text-[10px] font-black text-brand-yellow/60 uppercase tracking-widest mb-1 italic">Total Claims Issued</p>
-                         <p className="text-3xl font-black text-white tracking-tighter italic">{result.payouts?.length || 0}</p>
-                      </div>
-                      <div className="bg-black/20 rounded-[16px] p-5 border border-white/5">
-                         <p className="text-[10px] font-black text-brand-yellow/60 uppercase tracking-widest mb-1 italic">Data Integrity</p>
-                         <div className="flex items-center gap-2">
-                             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-                             <p className="text-lg font-black text-emerald-500 tracking-tight italic uppercase">Authenticated</p>
+              <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-100 shadow-sm">
+                 <div className="flex items-start gap-4">
+                    <div className="p-3 bg-white rounded-xl shadow-sm border border-emerald-100">
+                       <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-emerald-900 mb-1">Execution Successful</h4>
+                      <p className="text-emerald-700 text-sm mb-4 leading-relaxed">{result.message}</p>
+                      
+                      <div className="flex gap-6">
+                         <div>
+                            <p className="text-xs font-medium text-emerald-600/70 uppercase tracking-wide mb-1">Payouts Processed</p>
+                            <p className="text-2xl font-bold text-emerald-800">{result.payouts?.length || 0}</p>
+                         </div>
+                         <div>
+                            <p className="text-xs font-medium text-emerald-600/70 uppercase tracking-wide mb-1">Status</p>
+                            <p className="text-lg font-bold text-emerald-800 mt-1">Verified</p>
                          </div>
                       </div>
-                   </div>
+                    </div>
                  </div>
               </div>
            )}
 
-           <div className="flex-grow bg-brand-slate/80 border border-white/10 rounded-[32px] p-8 flex flex-col tech-border relative overflow-hidden">
-              <div className="absolute inset-0 bg-dot-grid-dark opacity-10 pointer-events-none" />
-              <div className="flex items-center justify-between mb-8 relative z-10">
-                 <div className="flex items-center gap-3">
-                    <Globe className="w-5 h-5 text-brand-yellow" />
-                    <h3 className="font-black uppercase text-xs tracking-widest text-slate-400 italic">Parametric Audit Log</h3>
+           {/* Audit Log Data Table */}
+           <div className="flex-grow bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col">
+              <div className="flex items-center justify-between mb-6">
+                 <div>
+                    <h3 className="font-semibold text-slate-800 text-lg">Payout Ledger</h3>
+                    <p className="text-sm text-slate-500">Recent automated transactions</p>
                  </div>
-                 <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                 <div className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 shadow-sm">
                     Live Feed
                  </div>
               </div>
 
-              <div className="flex-grow space-y-3 relative z-10">
-                 {/* Data Grid Header */}
-                 <div className="grid grid-cols-12 gap-4 px-4 py-2 border-b border-white/10 mb-2 hidden md:grid">
-                    <div className="col-span-3 text-[8px] font-black text-slate-500 uppercase tracking-widest">Trigger Node</div>
-                    <div className="col-span-3 text-[8px] font-black text-slate-500 uppercase tracking-widest">Partner Identity</div>
-                    <div className="col-span-3 text-[8px] font-black text-slate-500 uppercase tracking-widest">Settlement Hash</div>
-                    <div className="col-span-3 text-[8px] font-black text-slate-500 uppercase tracking-widest text-right">Value (INR)</div>
+              <div className="flex-grow">
+                 {/* Table Header */}
+                 <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-slate-50 border-y border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 hidden md:grid">
+                    <div className="col-span-3">Trigger Event</div>
+                    <div className="col-span-3">Recipient</div>
+                    <div className="col-span-3">Hash Ref</div>
+                    <div className="col-span-3 text-right">Amount</div>
                  </div>
 
-                 {payoutHistory.length > 0 ? (
-                   payoutHistory.slice().reverse().map((p, i) => (
-                      <div 
-                        key={p.id}
-                        className="group bg-white/5 border border-white/5 rounded-[12px] p-4 flex flex-col md:grid md:grid-cols-12 items-center gap-4 hover:bg-white/10 hover:border-brand-yellow/30 transition-colors"
-                      >
-                         <div className="col-span-12 md:col-span-3 w-full flex items-center gap-3">
-                            <div className="w-8 h-8 bg-brand-yellow/10 rounded-md border border-brand-yellow/20 flex items-center justify-center">
-                               <Zap className="w-4 h-4 text-brand-yellow" />
-                            </div>
-                            <span className="font-black text-xs uppercase tracking-widest">{p.trigger_type}</span>
-                         </div>
+                 {/* Table Rows */}
+                 <div className="space-y-2">
+                   {payoutHistory.length > 0 ? (
+                     payoutHistory.slice().reverse().map((p, i) => (
+                        <div 
+                          key={p.id}
+                          className="bg-white border border-slate-100 rounded-xl p-4 flex flex-col md:grid md:grid-cols-12 items-center gap-4 hover:shadow-md transition-shadow"
+                        >
+                           <div className="col-span-12 md:col-span-3 w-full flex items-center gap-3">
+                              <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center border border-blue-100">
+                                 <Zap className="w-4 h-4 text-blue-500" />
+                              </div>
+                              <span className="font-semibold text-sm text-slate-800">{p.trigger_type}</span>
+                           </div>
 
-                         <div className="col-span-12 md:col-span-3 w-full">
-                            <p className="font-bold text-[10px] text-slate-400 tracking-widest uppercase">{p.user_name || 'Anonymous Node'}</p>
-                         </div>
+                           <div className="col-span-12 md:col-span-3 w-full">
+                              <p className="font-medium text-sm text-slate-600">{p.user_name || 'System Worker'}</p>
+                           </div>
 
-                         <div className="col-span-12 md:col-span-3 w-full">
-                            <p className="font-black text-[10px] tracking-widest opacity-40 uppercase">UPI_{p.id.substring(0,8)}</p>
-                         </div>
+                           <div className="col-span-12 md:col-span-3 w-full">
+                              <p className="font-mono text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded inline-block">UPI_{p.id.substring(0,8)}</p>
+                           </div>
 
-                         <div className="col-span-12 md:col-span-3 w-full text-left md:text-right">
-                            <p className="font-black text-brand-yellow text-sm tracking-widest italic">₹{p.amount}</p>
-                         </div>
-                      </div>
-                   ))
-                 ) : (
-                   <div className="h-full flex flex-col items-center justify-center py-20 bg-white/5 rounded-[16px] border border-dashed border-white/10">
-                      <BarChart3 className="w-12 h-12 mb-4 opacity-10" />
-                      <p className="font-black uppercase tracking-[0.3em] text-[10px] opacity-30">Awaiting Telemetry</p>
-                   </div>
-                 )}
+                           <div className="col-span-12 md:col-span-3 w-full text-left md:text-right">
+                              <p className="font-bold text-slate-900">₹{p.amount}</p>
+                              <p className="text-[10px] font-medium text-emerald-500 uppercase">Settled</p>
+                           </div>
+                        </div>
+                     ))
+                   ) : (
+                     <div className="h-40 flex flex-col items-center justify-center bg-slate-50 rounded-xl border border-dashed border-slate-200 mt-4">
+                        <BarChart3 className="w-8 h-8 text-slate-300 mb-3" />
+                        <p className="font-medium text-sm text-slate-500">No transactions recorded yet</p>
+                     </div>
+                   )}
+                 </div>
               </div>
            </div>
         </div>
       </div>
-
-      <Loader />
     </main>
-  );
-}
-
-function Loader() {
-  return (
-    <div className="fixed bottom-10 right-10 flex flex-col items-end gap-2 pointer-events-none">
-       <div className="flex gap-1">
-          {[1, 2, 3].map(i => <motion.div key={i} animate={{ opacity: [0.2, 1, 0.2] }} transition={{ repeat: Infinity, duration: 1.5, delay: i * 0.2 }} className="w-1.5 h-1.5 bg-brand-yellow rounded-full shadow-[0_0_8px_rgba(250,204,21,0.5)]" />)}
-       </div>
-       <p className="text-[8px] font-black uppercase tracking-[0.4em] text-slate-500">Live Global Monitoring</p>
-    </div>
   );
 }

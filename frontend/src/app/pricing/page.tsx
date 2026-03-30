@@ -16,9 +16,11 @@ const PLANS = [
       "UPI Instant Settlement",
       "Email Support"
     ],
-    icon: <Shield className="w-6 h-6 text-slate-400" />,
-    color: "bg-slate-50",
-    button: "Start Free Trial"
+    icon: <Shield className="w-5 h-5 text-slate-500" />,
+    color: "bg-white",
+    border: "border-slate-200",
+    button: "Start Free Trial",
+    buttonStyle: "bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200"
   },
   {
     name: "Gig Pro",
@@ -32,10 +34,12 @@ const PLANS = [
       "Priority Payout Queue",
       "WhatsApp Support"
     ],
-    icon: <Zap className="w-6 h-6 text-brand-yellow" />,
-    color: "bg-brand-slate text-white",
+    icon: <Zap className="w-5 h-5 text-blue-400" />,
+    color: "bg-slate-900 text-white",
+    border: "border-slate-800",
     popular: true,
-    button: "Go Pro Now"
+    button: "Go Pro Now",
+    buttonStyle: "bg-blue-600 text-white hover:bg-blue-500 border border-blue-500"
   },
   {
     name: "Fleet Enterprise",
@@ -49,82 +53,93 @@ const PLANS = [
       "Dedicated Account Manager",
       "API Integration"
     ],
-    icon: <Crown className="w-6 h-6 text-brand-yellow" />,
-    color: "bg-white border-2 border-brand-yellow",
-    button: "Contact Fleet Sales"
+    icon: <Crown className="w-5 h-5 text-slate-700" />,
+    color: "bg-white",
+    border: "border-slate-200",
+    button: "Contact Fleet Sales",
+    buttonStyle: "bg-white text-slate-900 hover:bg-slate-50 border border-slate-200"
   }
 ];
 
 export default function PricingPage() {
   return (
-    <main className="min-h-screen bg-white text-brand-slate selection:bg-brand-yellow selection:text-brand-dark pb-24">
+    <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-blue-100 selection:text-blue-900 pb-24 font-sans">
       <Navbar />
       
       <div className="container mx-auto px-6 pt-24 sm:pt-32">
         <div className="max-w-3xl mx-auto text-center mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm mb-6"
+          >
+             <span className="text-xs font-semibold text-slate-600 tracking-wide uppercase">Transparent Pricing</span>
+          </motion.div>
+
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl sm:text-7xl font-black tracking-tighter mb-6 leading-none italic"
+            className="text-5xl sm:text-6xl font-bold tracking-tight mb-6 leading-tight"
           >
-            Simple, <span className="text-brand-yellow">Micro</span> Pricing.
+            Simple, <span className="text-blue-600">Micro-Premiums.</span>
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-lg sm:text-xl text-slate-500 font-bold max-w-xl mx-auto leading-tight"
+            className="text-lg sm:text-xl text-slate-500 font-medium max-w-xl mx-auto leading-relaxed"
           >
-            We don't do complex contracts. Just small weekly premiums for instant parametric protection.
+            We don't do complex contracts. Just small weekly premiums for instant parametric protection that fits your gig schedule.
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto items-center">
           {PLANS.map((plan, i) => (
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
               key={plan.name}
-              className={`relative p-10 rounded-[48px] flex flex-col ${plan.color} shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-100 hover:scale-[1.02] transition-all`}
+              className={`relative p-8 rounded-3xl flex flex-col h-full ${plan.color} shadow-sm border ${plan.border} hover:shadow-md transition-shadow ${plan.popular ? 'md:scale-105 shadow-xl z-10 py-10' : 'z-0'}`}
             >
               {plan.popular && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1.5 bg-brand-yellow text-brand-dark rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1.5 bg-blue-600 text-white rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">
                   Most Trusted
                 </div>
               )}
 
               <div className="mb-8">
-                <div className={`p-4 w-fit rounded-2xl mb-6 ${plan.popular ? 'bg-white/10' : 'bg-slate-100'}`}>
+                <div className={`p-3 w-fit rounded-xl mb-6 ${plan.popular ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-100'} border`}>
                    {plan.icon}
                 </div>
-                <h3 className="text-2xl font-black tracking-tight mb-2 italic uppercase">{plan.name}</h3>
-                <p className={`text-sm font-bold leading-snug ${plan.popular ? 'text-slate-400' : 'text-slate-500'}`}>
+                <h3 className="text-xl font-bold tracking-tight mb-2">{plan.name}</h3>
+                <p className={`text-sm font-medium leading-relaxed ${plan.popular ? 'text-slate-400' : 'text-slate-500'}`}>
                   {plan.description}
                 </p>
               </div>
 
               <div className="mb-10">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-5xl font-black tracking-tighter italic">{plan.price}</span>
-                  {plan.period !== "per partner" && <span className={`font-black text-sm uppercase opacity-40 italic`}>/{plan.period}</span>}
+                  <span className="text-4xl font-bold tracking-tight">{plan.price}</span>
+                  {plan.period !== "per partner" && <span className={`font-medium text-sm ${plan.popular ? 'text-slate-500' : 'text-slate-400'}`}>/{plan.period}</span>}
                 </div>
-                {plan.period === "per partner" && <p className="text-[10px] font-black uppercase tracking-widest opacity-40 mt-1">Scale with your fleet</p>}
+                {plan.period === "per partner" && <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mt-2">Scale with your fleet</p>}
               </div>
 
-              <div className="space-y-4 mb-12 flex-grow">
+              <div className="space-y-4 mb-10 flex-grow">
                 {plan.features.map(feature => (
                   <div key={feature} className="flex items-start gap-3">
-                    <div className={`mt-1 bg-brand-yellow/20 p-0.5 rounded-full`}>
-                      <Check className="w-3.5 h-3.5 text-brand-yellow" />
+                    <div className={`mt-0.5 p-0.5 rounded-full ${plan.popular ? 'bg-blue-500/20' : 'bg-emerald-50'}`}>
+                      <Check className={`w-3.5 h-3.5 ${plan.popular ? 'text-blue-400' : 'text-emerald-500'}`} />
                     </div>
-                    <span className={`text-sm font-bold ${plan.popular ? 'text-slate-300' : 'text-slate-600'}`}>{feature}</span>
+                    <span className={`text-sm font-medium ${plan.popular ? 'text-slate-300' : 'text-slate-600'}`}>{feature}</span>
                   </div>
                 ))}
               </div>
 
-              <a href={plan.name === "Fleet Enterprise" ? "/support" : "/login"} className="w-full">
-                <button className={`w-full py-5 rounded-3xl font-black text-lg transition-all active:scale-95 shadow-xl ${plan.popular ? 'bg-brand-yellow text-brand-dark hover:bg-white' : 'bg-brand-slate text-white hover:bg-black'}`}>
+              <a href={plan.name === "Fleet Enterprise" ? "/support" : "/login"} className="w-full mt-auto">
+                <button className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-all shadow-sm ${plan.buttonStyle}`}>
                   {plan.button}
                 </button>
               </a>
@@ -134,19 +149,19 @@ export default function PricingPage() {
 
         {/* Dynamic Risk Calculator Teaser */}
         <motion.div 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-24 p-12 rounded-[56px] bg-slate-50 border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-8 max-w-7xl mx-auto"
+          className="mt-24 p-10 rounded-3xl bg-white border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-8 max-w-6xl mx-auto"
         >
           <div className="max-w-xl">
-             <h4 className="text-4xl font-black tracking-tighter mb-4 italic">Precise Risk-Based Adjustments.</h4>
-             <p className="text-slate-500 font-bold leading-tight">
+             <h4 className="text-2xl font-bold tracking-tight mb-3 text-slate-900">Precise Risk-Based Adjustments</h4>
+             <p className="text-slate-500 font-medium leading-relaxed text-sm">
                Your premium isn't fixed in a vacuum. Our AI aggregates historical IMD data and local telemetry to ensure you pay the fairest rate for the specific risks in your delivery zone.
              </p>
           </div>
-          <a href="/dashboard" className="px-10 py-5 bg-white border-2 border-brand-slate text-brand-slate font-black rounded-3xl hover:bg-brand-slate hover:text-white transition-all text-lg shadow-xl shrink-0">
-             Open Area Risk Map
+          <a href="/dashboard" className="px-6 py-3 bg-white border border-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition-all text-sm shadow-sm shrink-0">
+             View Risk Telemetry
           </a>
         </motion.div>
       </div>

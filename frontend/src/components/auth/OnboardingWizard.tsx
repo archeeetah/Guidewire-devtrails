@@ -118,22 +118,16 @@ export default function OnboardingWizard() {
     setIsSubmitting(false);
   };
 
-  const platforms = [
-    { id: "Zomato", icon: <Utensils className="w-6 h-6" />, color: "text-red-500", bg: "bg-red-50" },
-    { id: "Amazon", icon: <Package className="w-6 h-6" />, color: "text-orange-500", bg: "bg-orange-50" },
-    { id: "Zepto", icon: <ShoppingCart className="w-6 h-6" />, color: "text-purple-500", bg: "bg-purple-50" },
-  ];
-
   return (
-    <div className="w-full max-w-xl mx-auto bg-white/90 backdrop-blur-xl rounded-[40px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1),0_0_20px_rgba(250,204,21,0.05)] overflow-y-auto border border-slate-100 p-6 sm:p-12 max-h-[85vh] sm:min-h-[550px] flex flex-col relative overscroll-contain">
+    <div className="w-full max-w-xl mx-auto bg-white rounded-3xl shadow-xl overflow-y-auto border border-slate-200 p-8 sm:p-12 max-h-[85vh] sm:min-h-[550px] flex flex-col relative overscroll-contain font-sans">
       
-      {/* Progress Bar with Glow */}
+      {/* Progress Bar */}
       {step < 7 && (
-        <div className="w-full h-1.5 bg-slate-100/50 mt-4 rounded-full overflow-hidden shrink-0 relative">
+        <div className="w-full h-1.5 bg-slate-100 mb-8 rounded-full overflow-hidden shrink-0 relative">
           <motion.div 
-            className="h-full bg-brand-yellow shadow-[0_0_15px_rgba(250,204,21,0.6)]"
+            className="h-full bg-blue-600 rounded-full"
             animate={{ width: `${(step / 7) * 100}%` }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
           />
         </div>
       )}
@@ -143,177 +137,131 @@ export default function OnboardingWizard() {
           
           {/* STEP 1: Phone */}
           {step === 1 && (
-            <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} style={{ willChange: "transform, opacity" }}>
-              <h2 className="text-2xl sm:text-3xl font-black text-brand-slate mb-2">Enter your number</h2>
-              <p className="text-slate-500 mb-8 font-medium">We'll send you an OTP to verify your account.</p>
+            <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
+              <h2 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">Create Account</h2>
+              <p className="text-slate-500 mb-8 font-medium">We'll send you an OTP to verify your identity.</p>
               
-              <div className="flex items-center gap-4 bg-slate-50 border-2 border-slate-100 rounded-3xl p-5 focus-within:border-brand-yellow focus-within:bg-white focus-within:shadow-[0_0_30px_rgba(250,204,21,0.15)] transition-all duration-300">
-                <span className="text-slate-400 font-black text-xl tracking-tighter">+91</span>
+              <div className="flex items-center gap-4 bg-slate-50 border border-slate-200 rounded-2xl p-4 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all duration-300">
+                <span className="text-slate-400 font-semibold text-xl">+91</span>
                 <input 
-                  type="tel"
+                  type="text"
                   maxLength={10}
-                  placeholder="99999 99999"
-                  className="bg-transparent w-full text-2xl font-black text-brand-slate border-none focus:outline-none placeholder:text-slate-300"
+                  placeholder="Enter mobile number"
+                  className="bg-transparent w-full text-xl font-semibold text-slate-900 border-none focus:outline-none placeholder:text-slate-300"
                   value={formData.phone_number}
                   onChange={(e) => updateForm("phone_number", e.target.value.replace(/\D/g, '').slice(0, 10))}
                 />
               </div>
 
               <motion.button 
-                whileTap={{ scale: 0.97 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={handleNext}
                 disabled={formData.phone_number.length < 10}
-                className="w-full mt-8 py-5 bg-brand-slate text-white text-lg font-black rounded-3xl hover:bg-black transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-xl"
+                className="w-full mt-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-2xl hover:bg-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm"
               >
-                Send OTP <ArrowRight className="w-6 h-6" />
+                Continue <ArrowRight className="w-5 h-5" />
               </motion.button>
             </motion.div>
           )}
 
           {/* STEP 2: OTP */}
           {step === 2 && (
-            <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} style={{ willChange: "transform, opacity" }}>
-              <h2 className="text-2xl sm:text-3xl font-black text-brand-slate mb-2">Verify OTP</h2>
-              <p className="text-slate-500 mb-8 font-medium">Enter the simulated code sent to {formData.phone_number}</p>
+            <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
+              <h2 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">Verify Code</h2>
+              <p className="text-slate-500 mb-8 font-medium">Enter the 4-digit code sent to +91 {formData.phone_number}</p>
               
-              <div className="flex justify-between gap-4">
+              <div className="flex justify-between gap-4 max-w-xs mx-auto mb-8">
                 {[1,2,3,4].map(idx => (
-                  <input key={idx} type="text" maxLength={1} defaultValue="1" className="w-16 h-16 text-center text-2xl font-black bg-slate-50 border border-slate-200 rounded-2xl focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 outline-none" />
+                  <input key={idx} type="text" maxLength={1} defaultValue="1" className="w-14 h-16 text-center text-2xl font-bold bg-white border border-slate-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-shadow" />
                 ))}
               </div>
 
-              <button 
+              <motion.button 
+                whileTap={{ scale: 0.98 }}
                 onClick={handleNext}
-                className="w-full mt-8 py-4 bg-brand-slate text-white font-bold rounded-2xl hover:bg-black transition-all flex items-center justify-center gap-2"
+                className="w-full py-4 bg-slate-900 text-white text-lg font-semibold rounded-2xl hover:bg-slate-800 transition-all flex items-center justify-center shadow-sm"
               >
-                Verify & Continue
-              </button>
+                Verify & Proceed
+              </motion.button>
             </motion.div>
           )}
 
           {/* STEP 3: Profile */}
           {step === 3 && (
-            <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} style={{ willChange: "transform, opacity" }}>
-              <h2 className="text-2xl sm:text-3xl font-black text-brand-slate mb-6 sm:mb-8">Tell us about yourself</h2>
+            <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-6 tracking-tight">Professional Details</h2>
               
-              <label className="block text-sm font-bold text-brand-slate mb-2">Full Name</label>
-              <input 
-                type="text"
-                placeholder="Rahul Kumar"
-                className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-lg font-bold text-brand-slate mb-8 focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 outline-none"
-                value={formData.name}
-                onChange={(e) => updateForm("name", e.target.value)}
-              />
+              <div className="space-y-5">
+                 <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Legal Name</label>
+                    <input 
+                      type="text"
+                      placeholder="As per government ID"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-base font-semibold text-slate-900 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+                      value={formData.name}
+                      onChange={(e) => updateForm("name", e.target.value)}
+                    />
+                 </div>
 
-              <label className="block text-sm font-bold text-brand-slate mb-2">Primary Platform (Search or Type)</label>
-              <div className="relative">
-                <input 
-                  type="text"
-                  placeholder="e.g. Swiggy, Uber, Porter..."
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-lg font-bold text-brand-slate focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 outline-none"
-                  value={platformSearch}
-                  onFocus={() => setShowDropdown(true)}
-                  onChange={(e) => {
-                     setPlatformSearch(e.target.value);
-                     updateForm("platform", e.target.value);
-                     setShowDropdown(true);
-                  }}
-                />
-                
-                {showDropdown && platformSearch && (
-                  <div className="absolute z-50 w-full mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl max-h-48 overflow-y-auto">
-                    {filteredCompanies.length > 0 ? (
-                      filteredCompanies.map(c => (
-                        <div 
-                           key={c}
-                           onClick={() => selectPlatform(c)}
-                           className="p-4 cursor-pointer hover:bg-slate-50 border-b border-slate-50 text-brand-slate font-bold last:border-b-0"
-                        >
-                          {c}
-                        </div>
-                      ))
-                    ) : (
-                      <div className="p-4 text-slate-400 font-bold">
-                         Press continue to use "{platformSearch}" natively!
+                 <div className="relative">
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Primary App Provider</label>
+                    <input 
+                      type="text"
+                      placeholder="e.g. Swiggy, Uber..."
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-base font-semibold text-slate-900 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+                      value={platformSearch}
+                      onFocus={() => setShowDropdown(true)}
+                      onChange={(e) => {
+                         setPlatformSearch(e.target.value);
+                         updateForm("platform", e.target.value);
+                         setShowDropdown(true);
+                      }}
+                    />
+                    
+                    {showDropdown && platformSearch && (
+                      <div className="absolute z-50 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                        {filteredCompanies.length > 0 ? (
+                          filteredCompanies.map(c => (
+                            <div 
+                               key={c}
+                               onClick={() => selectPlatform(c)}
+                               className="p-3 cursor-pointer hover:bg-slate-50 border-b border-slate-100 text-slate-700 font-semibold text-sm last:border-b-0"
+                            >
+                              {c}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="p-3 text-slate-500 font-medium text-sm">
+                             Use "{platformSearch}" manually
+                          </div>
+                        )}
                       </div>
                     )}
-                  </div>
-                )}
-              </div>
+                 </div>
 
-              <div className="relative flex items-center py-6 mt-2">
-                 <div className="flex-grow border-t border-slate-100"></div>
-                 <span className="flex-shrink-0 mx-4 text-slate-400 text-xs font-bold uppercase tracking-widest">Optional Fast-Track</span>
-                 <div className="flex-grow border-t border-slate-100"></div>
-              </div>
-
-              {!hasScanned ? (
-                <div className={`relative border-2 border-dashed rounded-3xl p-6 flex flex-col items-center justify-center transition-all overflow-hidden ${isScanning ? 'border-brand-yellow bg-brand-yellow/5' : 'border-slate-200 hover:border-brand-yellow/50 bg-slate-50'}`}>
-                  
-                  {isScanning && (
-                    <motion.div 
-                      initial={{ top: "-10%" }} 
-                      animate={{ top: "110%" }} 
-                      transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                      style={{ willChange: "top" }}
-                      className="absolute w-full h-1 bg-brand-yellow opacity-80 z-10"
+                 <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Platform Worker ID</label>
+                    <input 
+                       type="text"
+                       placeholder="e.g. 9102-ABC"
+                       className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-base font-semibold text-slate-900 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+                       value={formData.platform_worker_id}
+                       onChange={(e) => updateForm("platform_worker_id", e.target.value)}
                     />
-                  )}
-
-                  {isScanning ? (
-                    <div className="flex flex-col items-center z-20">
-                      <ScanSearch className="w-10 h-10 text-brand-yellow animate-pulse mb-3" />
-                      <p className="font-bold text-brand-slate">ShramShield AI Vision</p>
-                      <p className="text-sm font-medium text-slate-500">Scanning Document...</p>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center z-20">
-                      <UploadCloud className="w-10 h-10 text-slate-300 mb-3 group-hover:text-brand-yellow transition-colors" />
-                      <p className="font-bold text-brand-slate text-center">Upload Partner App Screenshot</p>
-                      <p className="text-sm font-medium text-slate-500 text-center mb-4">Drop image to Auto-Extract KYC</p>
-                      <label className="cursor-pointer bg-white border border-slate-200 px-6 py-2 rounded-full text-sm font-bold text-brand-slate hover:bg-slate-50 transition-all shadow-sm">
-                        Choose File
-                        <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} />
-                      </label>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="border border-green-200 bg-green-50 rounded-3xl p-6 flex items-center gap-4">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex justify-center items-center shrink-0">
-                     <CheckCircle2 className="w-6 h-6 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-green-900 border-b border-green-200/50 pb-1 mb-1">AI Profile Verified</p>
-                    <p className="text-sm font-medium text-green-700">Extracted ID Tag: <span className="font-black bg-white px-2 py-0.5 rounded shadow-sm ml-1">{formData.platform_worker_id}</span></p>
-                  </div>
-                </motion.div>
-              )}
-
-              <label className="block text-sm font-black text-brand-slate uppercase tracking-widest mb-2 mt-8 opacity-40">Worker ID / Partner App Tag</label>
-              <input 
-                 type="text"
-                 placeholder="e.g. ABC or Worker-9102"
-                 className="w-full bg-slate-50 border-2 border-slate-100 rounded-3xl p-5 text-xl font-black text-brand-slate uppercase focus:border-brand-yellow focus:bg-white transition-all outline-none"
-                 value={formData.platform_worker_id}
-                 onChange={(e) => updateForm("platform_worker_id", e.target.value)}
-              />
+                 </div>
+              </div>
 
               <motion.button 
-                whileTap={{ scale: 0.97 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => {
                   setStep(4);
                   setTimeout(() => setStep(5), 2500);
                 }}
                 disabled={!formData.name || !formData.platform || !formData.platform_worker_id}
-                className="w-full mt-10 py-5 bg-brand-yellow text-brand-dark text-lg font-black rounded-3xl hover:bg-black hover:text-white transition-all disabled:opacity-30 flex items-center justify-center gap-2 shadow-xl shadow-brand-yellow/10"
+                className="w-full mt-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-xl hover:bg-blue-500 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
               >
-                Continue
+                Continue <ArrowRight className="w-5 h-5" />
               </motion.button>
-
-              {(!formData.name || !formData.platform || !formData.platform_worker_id) && (
-                <p className="text-center mt-4 text-xs font-black text-slate-300 uppercase tracking-widest">Please fill all fields to continue</p>
-              )}
             </motion.div>
           )}
 
@@ -322,155 +270,142 @@ export default function OnboardingWizard() {
                key="step4" 
                initial={{ opacity: 0 }} 
                animate={{ opacity: 1 }} 
-               className="flex flex-col items-center justify-center py-24 text-center relative overflow-hidden"
+               className="flex flex-col items-center justify-center py-20 text-center"
             >
-               <div className="relative mb-8">
-                  <div className="w-24 h-24 border-[6px] border-brand-yellow/10 border-t-brand-yellow rounded-full animate-spin" />
-                  <ShieldCheck className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-brand-yellow w-10 h-10" />
-               </div>
-               
-               <h2 className="text-3xl font-black text-brand-slate mb-3 tracking-tighter italic">Authenticating Core</h2>
-               <p className="text-slate-500 font-bold max-w-xs mx-auto text-sm leading-tight">
-                 ShramShield AI is validating worker ID: 
-                 <span className="block text-brand-yellow bg-brand-slate px-3 py-1 rounded-full mt-2 font-black uppercase text-xs tracking-widest">{formData.platform_worker_id}</span>
+               <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-6" />
+               <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">Verifying Partner Identity</h2>
+               <p className="text-slate-500 font-medium max-w-xs mx-auto text-sm leading-relaxed">
+                 Securely validating worker credentials with {formData.platform || "Platform"} database.
                </p>
-               
-               <div className="mt-12 flex gap-1.5 justify-center">
-                  {[1, 2, 3].map(i => (
-                    <motion.div 
-                       key={i} 
-                       animate={{ scale: [1, 1.5, 1], opacity: [0.3, 1, 0.3] }} 
-                       transition={{ repeat: Infinity, duration: 1, delay: i * 0.2 }}
-                       className="w-2 h-2 bg-brand-yellow rounded-full" 
-                    />
-                  ))}
-               </div>
             </motion.div>
           )}
 
           {/* STEP 5: Zone */}
           {step === 5 && (
-            <motion.div key="step5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} style={{ willChange: "transform, opacity" }}>
-              <h2 className="text-2xl sm:text-3xl font-black text-brand-slate mb-2">Where do you work?</h2>
-              <p className="text-slate-500 mb-8 font-medium">We use this to track local weather and curfews to protect your income automatically.</p>
+            <motion.div key="step5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
+              <h2 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">Operating Context</h2>
+              <p className="text-slate-500 mb-8 font-medium">Define your primary delivery zone for localized risk telemetry.</p>
               
-              <div className="flex flex-col gap-4">
-                <input 
-                  type="text"
-                  placeholder="e.g. Bandra, Mumbai"
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-3xl p-5 text-xl font-black text-brand-slate focus:border-brand-yellow focus:bg-white transition-all outline-none"
-                  value={formData.primary_zone}
-                  onChange={(e) => updateForm("primary_zone", e.target.value)}
-                />
+              <div className="flex flex-col gap-5">
+                <div>
+                   <label className="block text-sm font-semibold text-slate-700 mb-2">City / Zone</label>
+                   <input 
+                     type="text"
+                     placeholder="e.g. Bandra, Mumbai"
+                     className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-base font-semibold text-slate-900 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+                     value={formData.primary_zone}
+                     onChange={(e) => updateForm("primary_zone", e.target.value)}
+                   />
+                </div>
                 
-                <div className="relative flex items-center py-2">
-                  <div className="flex-grow border-t border-slate-100"></div>
-                  <span className="flex-shrink-0 mx-4 text-slate-400 text-xs font-black">OR</span>
-                  <div className="flex-grow border-t border-slate-100"></div>
+                <div className="relative flex items-center py-1">
+                  <div className="flex-grow border-t border-slate-200"></div>
+                  <span className="flex-shrink-0 mx-4 text-slate-400 text-xs font-semibold uppercase tracking-wider">or</span>
+                  <div className="flex-grow border-t border-slate-200"></div>
                 </div>
 
                 <motion.button 
-                  whileTap={{ scale: 0.97 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={autoDetectLocation}
                   disabled={isDetecting}
-                  className="w-full p-5 rounded-3xl font-black text-brand-slate transition-all border-2 border-brand-yellow bg-brand-yellow/5 hover:bg-brand-yellow hover:text-brand-dark flex justify-center items-center gap-3 disabled:opacity-30"
+                  className="w-full p-4 rounded-xl font-semibold text-slate-700 transition-all border border-slate-200 bg-white hover:bg-slate-50 flex justify-center items-center gap-2 disabled:opacity-50"
                 >
                   {isDetecting ? (
-                    <><Loader2 className="w-6 h-6 animate-spin"/> Locating Satellite...</>
+                    <><Loader2 className="w-5 h-5 animate-spin"/> Locating Satellite...</>
                   ) : (
-                    <>📍 Auto-Detect My Location</>
+                    <>📍 Auto-Detect Location</>
                   )}
                 </motion.button>
               </div>
 
               <motion.button 
-                whileTap={{ scale: 0.97 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setStep(6)}
                 disabled={!formData.primary_zone}
-                className="w-full mt-6 py-5 bg-brand-slate text-white text-lg font-black rounded-3xl hover:bg-black transition-all disabled:opacity-30 flex items-center justify-center gap-2"
+                className="w-full mt-8 py-4 bg-slate-900 text-white text-lg font-semibold rounded-xl hover:bg-slate-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
               >
-                Continue to Payouts
+                Continue
               </motion.button>
             </motion.div>
           )}
 
           {step === 6 && (
-            <motion.div key="step6" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} style={{ willChange: "transform, opacity" }}>
-              <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center mb-6">
-                <CheckCircle2 className="w-6 h-6 text-green-500" />
+            <motion.div key="step6" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
+              <div className="w-12 h-12 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-center mb-6">
+                <ShieldCheck className="w-6 h-6 text-blue-600" />
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-brand-slate mb-2">Automated Payouts</h2>
-              <p className="text-slate-500 mb-8 font-medium">Where should we route your Parametric Payouts (₹2500) instantly when disaster strikes?</p>
+              <h2 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">Financial Routing</h2>
+              <p className="text-slate-500 mb-8 font-medium">Link your active UPI ID to receive instant parametric payouts.</p>
               
-              <label className="block text-sm font-bold text-brand-slate mb-2">Active UPI ID</label>
-              <input 
-                 type="email"
-                 placeholder="name@okicici"
-                 className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-lg font-bold text-brand-slate mb-8 focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 outline-none"
-                 value={formData.upi_id}
-                 onChange={(e) => updateForm("upi_id", e.target.value.toLowerCase())}
-              />
+              <div className="mb-8">
+                 <label className="block text-sm font-semibold text-slate-700 mb-2">Registered UPI ID</label>
+                 <input 
+                    type="email"
+                    placeholder="name@okicici"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-base font-semibold text-slate-900 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+                    value={formData.upi_id}
+                    onChange={(e) => updateForm("upi_id", e.target.value.toLowerCase())}
+                 />
+              </div>
+              
               <motion.button 
-                whileTap={{ scale: 0.97 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={handleSubmit}
                 disabled={!formData.upi_id.includes("@") || isSubmitting}
-                className="w-full py-5 bg-black text-white text-lg font-black rounded-3xl hover:bg-brand-yellow hover:text-black transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-xl shadow-brand-yellow/10"
+                className="w-full py-4 bg-blue-600 text-white text-lg font-semibold rounded-xl hover:bg-blue-500 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
               >
                 {isSubmitting ? (
-                  <><Loader2 className="w-6 h-6 animate-spin" /> Finalizing Protection...</>
+                  <><Loader2 className="w-5 h-5 animate-spin" /> Finalizing Profile...</>
                 ) : (
-                  <><ShieldCheck className="w-6 h-6" /> Lock & Generate Plan</>
+                  <>Activate Protection</>
                 )}
               </motion.button>
               
               {error && (
-                <p className="text-red-500 text-xs font-black uppercase text-center mt-4 tracking-wider animate-pulse">{error}</p>
+                <p className="text-rose-500 text-sm font-semibold text-center mt-4 bg-rose-50 p-3 rounded-lg border border-rose-100">{error}</p>
               )}
             </motion.div>
           )}
 
           {step === 7 && successData && (
-            <motion.div key="step7" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center text-center py-6 sm:py-10">
-               <div className="w-24 h-24 bg-brand-yellow rounded-[32px] flex items-center justify-center shadow-2xl shadow-brand-yellow/30 mb-8 transform rotate-3">
-                  <CheckCircle2 className="w-12 h-12 text-black" />
+            <motion.div key="step7" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center text-center py-4">
+               <div className="w-20 h-20 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center justify-center mb-6">
+                  <CheckCircle2 className="w-10 h-10 text-emerald-500" />
                </div>
                
-               <h2 className="text-4xl sm:text-6xl font-black text-brand-slate mb-2 tracking-tighter italic leading-none">
-                 You're In, {formData.name.split(' ')[0]}!
+               <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">
+                 Registration Complete
                </h2>
-               <p className="text-slate-500 font-bold mb-12 max-w-md mx-auto px-4 text-sm leading-snug">
-                 Your profile has been created and your hyper-local risk assessment is complete.
+               <p className="text-slate-500 font-medium mb-10 max-w-sm mx-auto">
+                 Welcome {formData.name.split(' ')[0]}. Your automated coverage is ready.
                </p>
 
-               <div className="bg-white rounded-[48px] p-10 sm:p-12 w-full shadow-[0_25px_60px_-15px_rgba(0,0,0,0.12)] border border-slate-100 relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-brand-yellow/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+               <div className="bg-slate-50 rounded-2xl p-8 w-full border border-slate-200 text-left mb-8">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">Risk-Adjusted Policy</p>
                   
-                  <div className="relative z-10 text-left">
-                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Your Personalized Premium</p>
-                     <div className="flex items-baseline gap-2 mb-6">
-                        <span className="text-6xl sm:text-7xl font-black tracking-tighter text-brand-slate italic leading-none">₹{successData.quote.final_weekly_premium}</span>
-                        <span className="text-slate-400 font-black text-2xl italic tracking-tighter">/week</span>
-                     </div>
-                     
-                     <div className="space-y-2 mb-10">
-                        {successData.quote.risk_factors.map((f: string, i: number) => (
-                           <div key={i} className="flex items-center gap-2 text-xs font-black text-brand-slate uppercase tracking-tight">
-                              <div className="w-2 h-2 rounded-full bg-brand-yellow" /> {f}
-                           </div>
-                        ))}
-                     </div>
-
-                     <a href="/portal">
-                        <button className="w-full py-5 bg-brand-slate text-white font-black rounded-3xl hover:bg-black transition-all shadow-2xl shadow-brand-slate/20 flex items-center justify-center gap-3 active:scale-95 text-lg group">
-                           Go to Worker Portal <ArrowRight className="w-5 h-5 text-brand-yellow group-hover:translate-x-1 transition-transform" />
-                        </button>
-                     </a>
+                  <div className="flex items-baseline gap-2 mb-6 border-b border-slate-200 pb-6">
+                     <span className="text-5xl font-bold tracking-tight text-slate-900">₹{successData.quote.final_weekly_premium}</span>
+                     <span className="text-slate-500 font-medium text-lg">/week</span>
+                  </div>
+                  
+                  <div className="space-y-3">
+                     {successData.quote.risk_factors.map((f: string, i: number) => (
+                        <div key={i} className="flex items-start gap-2 text-sm font-medium text-slate-700">
+                           <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" /> 
+                           <span>{f}</span>
+                        </div>
+                     ))}
                   </div>
                </div>
                
-               <p className="mt-12 text-[10px] font-black text-slate-300 uppercase tracking-[0.4em] px-10">
-                 Trusted Parametric Protection Powered by AI
-               </p>
+               <a href="/portal" className="w-full">
+                  <motion.button 
+                     whileTap={{ scale: 0.98 }}
+                     className="w-full py-4 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 transition-all shadow-sm flex items-center justify-center gap-2"
+                  >
+                     Go to Worker Portal <ArrowRight className="w-4 h-4 text-slate-400" />
+                  </motion.button>
+               </a>
             </motion.div>
           )}
 
