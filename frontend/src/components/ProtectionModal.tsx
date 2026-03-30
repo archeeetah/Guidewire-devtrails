@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ShieldCheck, Zap, CloudRain, AlertCircle, Wind, Loader2, ArrowRight } from "lucide-react";
+import { X, ShieldCheck, Zap, CloudRain, AlertCircle, Wind, Loader2, ArrowRight, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
 interface ProtectionModalProps {
@@ -72,21 +72,21 @@ export default function ProtectionModal({ isOpen, onClose, platform }: Protectio
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-stretch sm:justify-end">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
           />
           
           <motion.div
-            initial={{ opacity: 0, y: "100%", scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: "100%", scale: 0.95 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="relative w-full sm:max-w-xl bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200 max-h-[92dvh] overflow-y-auto flex flex-col font-sans"
+            initial={{ opacity: 0, x: "100%" }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: "100%" }}
+            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+            className="relative w-full sm:max-w-lg bg-white sm:border-l border-slate-200 shadow-2xl h-[92dvh] sm:h-full overflow-y-auto flex flex-col font-sans rounded-t-3xl sm:rounded-none"
           >
             {/* Header Area */}
             <div className="p-6 sm:p-8 pb-0 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur-md z-20 border-b border-white">

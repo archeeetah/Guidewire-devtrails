@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { 
   CloudLightning, MapPin, ShieldCheck, CheckCircle2, 
   CloudRain, AlertCircle, Loader2, ArrowRight, 
-  Zap, History, Navigation, Bell, Activity 
+  Zap, History, Navigation, Bell, Activity, ChevronRight, Home 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -97,7 +97,20 @@ export default function WorkerPortal() {
     <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-blue-100 selection:text-blue-900 pb-32 font-sans">
       
       {/* Clean Corporate Header */}
-      <header className="relative bg-white border-b border-slate-200 pt-16 pb-20 px-6 shadow-sm">
+      <header className="relative bg-white border-b border-slate-200 pt-8 pb-20 px-6 shadow-sm">
+        {/* Breadcrumb Row */}
+        <div className="max-w-lg mx-auto mb-8">
+          <nav className="flex items-center gap-1.5 text-xs font-medium">
+            <a href="/" className="text-slate-400 hover:text-blue-600 transition-colors flex items-center gap-1">
+              <Home className="w-3.5 h-3.5" /> Home
+            </a>
+            <ChevronRight className="w-3 h-3 text-slate-300" />
+            <span className="text-slate-600 font-semibold">Partner Portal</span>
+            <ChevronRight className="w-3 h-3 text-slate-300" />
+            <span className="text-blue-600 font-semibold">Dashboard</span>
+          </nav>
+        </div>
+
         <div className="relative z-10 max-w-lg mx-auto">
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-3">

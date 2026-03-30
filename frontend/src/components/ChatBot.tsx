@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { MessageSquare, X, Send, User, Bot, Globe, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -78,10 +79,16 @@ const TRANSLATIONS = {
   }
 };
 
+const HIDDEN_ROUTES = ["/login", "/dashboard", "/how-it-works"];
+
 export default function ChatBot() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [language, setLanguage] = useState<Language>("hinglish"); 
   const [showLangMenu, setShowLangMenu] = useState(false);
+
+  // Hide chatbot on pages where it's not needed
+  if (HIDDEN_ROUTES.includes(pathname)) return null;
   const [messages, setMessages] = useState<Message[]>([
     { id: "1", role: "bot", text: TRANSLATIONS["hinglish"].greeting }
   ]);
@@ -157,7 +164,7 @@ export default function ChatBot() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end">
+    <div className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 z-[100] flex flex-col items-end">
       
       <AnimatePresence>
         {isOpen && (
@@ -166,7 +173,7 @@ export default function ChatBot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="w-[340px] sm:w-[380px] h-[500px] bg-white rounded-2xl shadow-xl border border-slate-200 flex flex-col mb-4 overflow-hidden font-sans relative"
+            className="w-screen sm:w-[380px] h-[100dvh] sm:h-[500px] bg-white sm:rounded-2xl shadow-xl border border-slate-200 flex flex-col sm:mb-4 overflow-hidden font-sans relative"
           >
             {/* Custom Language Dropdown Menu */}
             <AnimatePresence>
@@ -200,25 +207,25 @@ export default function ChatBot() {
             </AnimatePresence>
 
             {/* Header */}
-            <div className="bg-slate-900 px-5 py-4 flex items-center justify-between shrink-0 relative z-30">
-               <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+            <div className="bg-slate-900 px-4 sm:px-5 py-3 sm:py-4 flex items-center justify-between shrink-0 relative z-30">
+               <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
                     <Bot className="w-4 h-4 text-white" />
                   </div>
-                  <div>
-                    <h3 className="text-white font-semibold text-sm leading-tight">{TRANSLATIONS[language].title}</h3>
+                  <div className="min-w-0">
+                    <h3 className="text-white font-semibold text-sm leading-tight truncate">{TRANSLATIONS[language].title}</h3>
                     <p className="text-blue-300 text-[10px] font-medium uppercase tracking-widest">{TRANSLATIONS[language].status}</p>
                   </div>
                </div>
                
-               <div className="flex items-center gap-3">
+               <div className="flex items-center gap-2 shrink-0">
                   {/* Custom Language Button */}
                   <button 
                     onClick={() => setShowLangMenu(!showLangMenu)}
-                    className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 transition-colors rounded-lg px-2.5 py-1.5 border border-slate-700"
+                    className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 transition-colors rounded-lg px-2 sm:px-2.5 py-1.5 border border-slate-700"
                   >
                     <Globe className="w-3.5 h-3.5 text-slate-300" />
-                    <span className="text-[11px] font-semibold text-white tracking-widest uppercase">
+                    <span className="hidden sm:inline text-[11px] font-semibold text-white tracking-widest uppercase">
                        {LANG_OPTIONS.find(l => l.value === language)?.label}
                     </span>
                     <ChevronDown className="w-3 h-3 text-slate-400" />
@@ -290,14 +297,16 @@ export default function ChatBot() {
       </AnimatePresence>
 
       {/* Floating Button */}
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 bg-slate-900 border border-slate-800 text-white rounded-full flex items-center justify-center shadow-lg shadow-slate-900/20 z-50 transition-colors hover:bg-slate-800"
-      >
-        {isOpen ? <X className="w-6 h-6" /> : <MessageSquare className="w-6 h-6" />}
-      </motion.button>
+      {!isOpen && (
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setIsOpen(true)}
+          className="w-14 h-14 bg-slate-900 border border-slate-800 text-white rounded-full flex items-center justify-center shadow-lg shadow-slate-900/20 z-50 transition-colors hover:bg-slate-800 m-4 sm:m-0"
+        >
+          <MessageSquare className="w-6 h-6" />
+        </motion.button>
+      )}
 
     </div>
   );
