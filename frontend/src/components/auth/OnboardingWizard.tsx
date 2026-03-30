@@ -318,10 +318,33 @@ export default function OnboardingWizard() {
           )}
 
           {step === 4 && (
-            <motion.div key="step4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ willChange: "opacity" }} className="flex flex-col items-center justify-center py-20 text-center">
-               <Loader2 className="w-16 h-16 text-brand-yellow animate-spin mb-6 mx-auto" />
-               <h2 className="text-2xl font-black text-brand-slate mb-2">Credential Verification</h2>
-               <p className="text-slate-500 font-bold max-w-xs mx-auto">Authorizing employment credentials for worker ID: <span className="text-brand-slate uppercase">{formData.platform_worker_id}</span></p>
+            <motion.div 
+               key="step4" 
+               initial={{ opacity: 0 }} 
+               animate={{ opacity: 1 }} 
+               className="flex flex-col items-center justify-center py-24 text-center relative overflow-hidden"
+            >
+               <div className="relative mb-8">
+                  <div className="w-24 h-24 border-[6px] border-brand-yellow/10 border-t-brand-yellow rounded-full animate-spin" />
+                  <ShieldCheck className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-brand-yellow w-10 h-10" />
+               </div>
+               
+               <h2 className="text-3xl font-black text-brand-slate mb-3 tracking-tighter italic">Authenticating Core</h2>
+               <p className="text-slate-500 font-bold max-w-xs mx-auto text-sm leading-tight">
+                 ShramShield AI is validating worker ID: 
+                 <span className="block text-brand-yellow bg-brand-slate px-3 py-1 rounded-full mt-2 font-black uppercase text-xs tracking-widest">{formData.platform_worker_id}</span>
+               </p>
+               
+               <div className="mt-12 flex gap-1.5 justify-center">
+                  {[1, 2, 3].map(i => (
+                    <motion.div 
+                       key={i} 
+                       animate={{ scale: [1, 1.5, 1], opacity: [0.3, 1, 0.3] }} 
+                       transition={{ repeat: Infinity, duration: 1, delay: i * 0.2 }}
+                       className="w-2 h-2 bg-brand-yellow rounded-full" 
+                    />
+                  ))}
+               </div>
             </motion.div>
           )}
 
@@ -406,36 +429,48 @@ export default function OnboardingWizard() {
             </motion.div>
           )}
 
-          {/* STEP 7: Success */}
-          {step === 7 && (
-            <motion.div key="step7" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} style={{ willChange: "transform, opacity" }} className="flex flex-col items-center text-center justify-center py-10">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                <CheckCircle2 className="w-10 h-10 text-green-500" />
-              </div>
-              
-              <h2 className="text-2xl sm:text-3xl font-black text-brand-slate mb-4">You're In, {formData.name.split(' ')[0]}!</h2>
-              <p className="text-slate-500 font-medium mb-8">Your profile has been created and your hyper-local risk assessment is complete.</p>
-              
-              <div className="w-full bg-brand-yellow/10 border border-brand-yellow/20 rounded-2xl p-6 mb-8 text-left">
-                <p className="text-sm font-bold text-slate-500 mb-2">Your Personalized Premium</p>
-                <div className="flex items-end gap-2 mb-4">
-                  <span className="text-5xl font-black text-brand-slate">₹{successData?.quote?.final_weekly_premium || "--"}</span>
-                  <span className="text-lg font-bold text-slate-500 mb-1">/week</span>
-                </div>
-                
-                {successData?.quote?.risk_factors?.map((f: string, i: number) => (
-                  <div key={i} className="flex items-center gap-2 mt-2 text-sm font-bold text-brand-slate">
-                    <span className="w-2 h-2 rounded-full bg-brand-yellow"></span>
-                    {f}
-                  </div>
-                ))}
-              </div>
+          {step === 7 && successData && (
+            <motion.div key="step7" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center text-center py-6 sm:py-10">
+               <div className="w-24 h-24 bg-brand-yellow rounded-[32px] flex items-center justify-center shadow-2xl shadow-brand-yellow/30 mb-8 transform rotate-3">
+                  <CheckCircle2 className="w-12 h-12 text-black" />
+               </div>
+               
+               <h2 className="text-4xl sm:text-6xl font-black text-brand-slate mb-2 tracking-tighter italic leading-none">
+                 You're In, {formData.name.split(' ')[0]}!
+               </h2>
+               <p className="text-slate-500 font-bold mb-12 max-w-md mx-auto px-4 text-sm leading-snug">
+                 Your profile has been created and your hyper-local risk assessment is complete.
+               </p>
 
-              <a href="/portal">
-                <button className="px-8 py-4 bg-brand-slate text-white font-bold rounded-2xl hover:bg-black transition-all shadow-xl">
-                  Go to Worker Portal
-                </button>
-              </a>
+               <div className="bg-white rounded-[48px] p-10 sm:p-12 w-full shadow-[0_25px_60px_-15px_rgba(0,0,0,0.12)] border border-slate-100 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-brand-yellow/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                  
+                  <div className="relative z-10 text-left">
+                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Your Personalized Premium</p>
+                     <div className="flex items-baseline gap-2 mb-6">
+                        <span className="text-6xl sm:text-7xl font-black tracking-tighter text-brand-slate italic leading-none">₹{successData.quote.final_weekly_premium}</span>
+                        <span className="text-slate-400 font-black text-2xl italic tracking-tighter">/week</span>
+                     </div>
+                     
+                     <div className="space-y-2 mb-10">
+                        {successData.quote.risk_factors.map((f: string, i: number) => (
+                           <div key={i} className="flex items-center gap-2 text-xs font-black text-brand-slate uppercase tracking-tight">
+                              <div className="w-2 h-2 rounded-full bg-brand-yellow" /> {f}
+                           </div>
+                        ))}
+                     </div>
+
+                     <a href="/portal">
+                        <button className="w-full py-5 bg-brand-slate text-white font-black rounded-3xl hover:bg-black transition-all shadow-2xl shadow-brand-slate/20 flex items-center justify-center gap-3 active:scale-95 text-lg group">
+                           Go to Worker Portal <ArrowRight className="w-5 h-5 text-brand-yellow group-hover:translate-x-1 transition-transform" />
+                        </button>
+                     </a>
+                  </div>
+               </div>
+               
+               <p className="mt-12 text-[10px] font-black text-slate-300 uppercase tracking-[0.4em] px-10">
+                 Trusted Parametric Protection Powered by AI
+               </p>
             </motion.div>
           )}
 

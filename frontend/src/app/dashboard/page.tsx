@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { 
   Zap, CloudRain, Wind, AlertCircle, History, 
   Terminal, Activity, ShieldAlert, Cpu, Globe, 
-  BarChart3, Settings, Play, RefreshCw, Layers 
+  BarChart3, Settings, Play, RefreshCw, Layers, Loader2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
