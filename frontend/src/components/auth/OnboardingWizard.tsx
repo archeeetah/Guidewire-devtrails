@@ -17,7 +17,7 @@ export default function OnboardingWizard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successData, setSuccessData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-  const API_URL = "http://127.0.0.1:8000";
+  const API_URL = "http://127.0.0.1:8001";
   const [platformSearch, setPlatformSearch] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
@@ -111,7 +111,7 @@ export default function OnboardingWizard() {
       setStep(7);
     } catch (err) {
       console.error("Registration failed", err);
-      setError("Network Outage: Backend unreachable at 127.0.0.1:8000");
+      setError("Network Outage: Backend unreachable at 127.0.0.1:8001");
     }
     setIsSubmitting(false);
   };
