@@ -13,7 +13,14 @@ def get_all_payouts(db: Session = Depends(get_db)):
     """
     Fetch the global audit log of all automated payouts.
     """
-    return db.query(Payout).order_by(Payout.processed_at.desc()).limit(50).all()
+    results = db.query(Payout, User.name, User.upi_id).join(User, Payout.user_id == User.id).order_by(Payout.processed_at.desc()).limit(50).all()
+    payout_list = []
+    for p, name, upi in results:
+        p_dict = {c.name: getattr(p, c.name) for c in p.__table__.columns}
+        p_dict["user_name"] = name
+        p_dict["user_upi"] = upi
+        payout_list.append(PayoutResponse(**p_dict))
+    return payout_list
 
 @router.get("/worker/{phone}", response_model=List[PayoutResponse])
 def get_worker_payouts(phone: str, db: Session = Depends(get_db)):
@@ -24,4 +31,11 @@ def get_worker_payouts(phone: str, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="Worker not found")
         
-    return db.query(Payout).filter(Payout.user_id == user.id).order_by(Payout.processed_at.desc()).all()
+    results = db.query(Payout, User.name, User.upi_id).filter(Payout.user_id == user.id).join(User, Payout.user_id == User.id).order_by(Payout.processed_at.desc()).all()
+    payout_list = []
+    for p, name, upi in results:
+        p_dict = {c.name: getattr(p, c.name) for c in p.__table__.columns}
+        p_dict["user_name"] = name
+        p_dict["user_upi"] = upi
+        payout_list.append(PayoutResponse(**p_dict))
+    return payout_list

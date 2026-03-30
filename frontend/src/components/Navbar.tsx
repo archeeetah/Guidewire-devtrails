@@ -20,9 +20,9 @@ export default function Navbar() {
         
         {/* Desktop nav links */}
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-500">
-          <a href="#" className="hover:text-brand-slate transition-colors">Pricing</a>
-          <a href="#" className="hover:text-brand-slate transition-colors">How it works</a>
-          <a href="#" className="hover:text-brand-slate transition-colors">Support</a>
+          <a href="/pricing" className="hover:text-brand-slate transition-colors">Pricing</a>
+          <a href="/how-it-works" className="hover:text-brand-slate transition-colors">How it works</a>
+          <a href="/support" className="hover:text-brand-slate transition-colors">Support</a>
         </div>
 
         {/* Right side: Login + Hamburger */}
@@ -55,9 +55,9 @@ export default function Navbar() {
             className="md:hidden border-t border-slate-100 bg-white overflow-hidden"
           >
             <div className="px-4 py-3 space-y-1">
-              <a href="#" onClick={() => setMenuOpen(false)} className="block py-3 px-3 text-sm font-medium text-slate-600 hover:text-brand-slate hover:bg-slate-50 rounded-xl transition-colors active:bg-slate-100">Pricing</a>
-              <a href="#" onClick={() => setMenuOpen(false)} className="block py-3 px-3 text-sm font-medium text-slate-600 hover:text-brand-slate hover:bg-slate-50 rounded-xl transition-colors active:bg-slate-100">How it works</a>
-              <a href="#" onClick={() => setMenuOpen(false)} className="block py-3 px-3 text-sm font-medium text-slate-600 hover:text-brand-slate hover:bg-slate-50 rounded-xl transition-colors active:bg-slate-100">Support</a>
+              <a href="/pricing" onClick={() => setMenuOpen(false)} className="block py-3 px-3 text-sm font-medium text-slate-600 hover:text-brand-slate hover:bg-slate-50 rounded-xl transition-colors active:bg-slate-100">Pricing</a>
+              <a href="/how-it-works" onClick={() => setMenuOpen(false)} className="block py-3 px-3 text-sm font-medium text-slate-600 hover:text-brand-slate hover:bg-slate-50 rounded-xl transition-colors active:bg-slate-100">How it works</a>
+              <a href="/support" onClick={() => setMenuOpen(false)} className="block py-3 px-3 text-sm font-medium text-slate-600 hover:text-brand-slate hover:bg-slate-50 rounded-xl transition-colors active:bg-slate-100">Support</a>
             </div>
           </motion.div>
         )}

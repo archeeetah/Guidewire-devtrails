@@ -25,16 +25,18 @@ html {
   --color-brand-yellow: var(--brand-yellow);
   --color-brand-slate: var(--brand-slate);
   --color-accent-soft: var(--accent-soft);
-  --font-sans: "Inter", var(--font-geist-sans), ui-sans-serif, system-ui;
+  --font-sans: 'Outfit', var(--font-geist-sans), ui-sans-serif, system-ui;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  font-size: 1rem; /* Restoring standard size for Outfit */
+  font-weight: 300; 
+  letter-spacing: -0.01em; 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overscroll-behavior-y: contain;
   padding-top: var(--safe-top);
   padding-bottom: var(--safe-bottom);
   padding-left: var(--safe-left);

@@ -1,29 +1,50 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { 
   Zap, CloudRain, Wind, AlertCircle, History, 
   Terminal, Activity, ShieldAlert, Cpu, Globe, 
-  BarChart3, Settings, Play, RefreshCw, Layers, Loader2
+  BarChart3, Settings, Play, RefreshCw, Layers, Loader2, Bell
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 
 export default function Dashboard() {
   const [adminStats, setAdminStats] = useState<any>(null);
   const [payoutHistory, setPayoutHistory] = useState<any[]>([]);
   const [isSimulating, setIsSimulating] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [simulationParams, setSimulationParams] = useState({
     trigger_type: "Flood",
     severity: "High",
     zone: "Mumbai"
   });
   const [result, setResult] = useState<any>(null);
+  const lastAlertId = useRef<number | string>(0);
 
   const fetchAdminStats = async () => {
     try {
       const res = await fetch("/api/admin/stats");
       const data = await res.json();
       setAdminStats(data);
+
+      // Handle Live Notifications Toasts
+      if (data.notifications && data.notifications.length > 0) {
+        const latest = data.notifications[0];
+        if (latest.id !== lastAlertId.current) {
+          lastAlertId.current = latest.id;
+          if (latest.type === "PAYOUT_ISSUED") {
+            toast.success(latest.title, {
+              description: latest.message,
+              duration: 5000,
+            });
+          } else {
+            toast.info(latest.title, {
+              description: latest.message,
+            });
+          }
+        }
+      }
     } catch (err) {
       console.error("Failed to fetch admin stats", err);
     }
@@ -42,6 +63,8 @@ export default function Dashboard() {
   const handleSimulate = async () => {
     setIsSimulating(true);
     setResult(null);
+    toast.loading("Initiating Global Parametric Cross-Check...", { id: "sim-loading" });
+    
     try {
       const res = await fetch("/api/triggers/simulate", {
         method: "POST",
@@ -50,9 +73,24 @@ export default function Dashboard() {
       });
       const data = await res.json();
       setResult(data);
+      toast.dismiss("sim-loading");
+      
+      if (data.status === "disrupted") {
+        toast.error(`ALERT: ${simulationParams.trigger_type} Cluster Detected`, {
+          description: `IMD confirmed. ${data.payouts?.length || 0} automated payouts dispatched.`,
+          duration: 6000
+        });
+      } else {
+        toast.info("Simulation Complete", {
+          description: "No thresholds breached in the target zone."
+        });
+      }
+      
       fetchPayoutHistory(); 
       fetchAdminStats();
     } catch (err) {
+      toast.dismiss("sim-loading");
+      toast.error("System Error", { description: "Failed to connect to simulation core." });
       console.error(err);
     }
     setIsSimulating(false);
@@ -77,14 +115,14 @@ export default function Dashboard() {
                <div className="p-2 bg-brand-yellow rounded-xl shadow-[0_0_20px_rgba(250,204,21,0.2)]">
                   <Terminal className="w-6 h-6 text-brand-dark" />
                </div>
-               <h1 className="text-sm font-black uppercase tracking-[0.4em] text-brand-yellow">Emergency Command Center v2</h1>
+               <h1 className="text-sm font-black uppercase tracking-[0.4em] text-brand-yellow">Emergency Command Center v3</h1>
             </div>
-            <h2 className="text-4xl font-black tracking-tighter leading-tight italic">AI Parametric Simulation Core</h2>
+            <h2 className="text-4xl font-black tracking-tighter leading-tight italic">AI Parametric System Dashboard</h2>
          </div>
 
          <div className="flex items-center gap-4 relative z-10">
             <div className="hidden sm:flex flex-col items-end">
-               <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-1">IMD Connection</p>
+               <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-1">Telemetry Status</p>
                <div className="flex items-center gap-2">
                   <span className="text-[10px] font-black text-blue-400">AUTHORITATIVE</span>
                   <div className="flex gap-1">
@@ -93,6 +131,45 @@ export default function Dashboard() {
                </div>
             </div>
             <div className="h-10 w-px bg-white/10 hidden sm:block" />
+            
+            <div className="relative">
+               <button 
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className="p-3 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all hover:scale-105 active:scale-95 relative"
+               >
+                  <Bell className="w-5 h-5 text-slate-400" />
+                  {adminStats?.notifications?.length > 0 && (
+                    <span className="absolute top-2 right-2 w-2 h-2 bg-brand-yellow rounded-full animate-pulse shadow-[0_0_8px_rgba(250,204,21,0.8)]" />
+                  )}
+               </button>
+
+               <AnimatePresence>
+                 {showNotifications && (
+                   <motion.div 
+                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                     animate={{ opacity: 1, y: 0, scale: 1 }}
+                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                     className="absolute right-0 mt-4 w-80 bg-brand-slate/90 backdrop-blur-2xl border border-white/10 rounded-[24px] shadow-2xl p-6 z-[100]"
+                   >
+                     <h4 className="font-black text-[10px] uppercase tracking-[0.3em] text-slate-500 mb-4 px-1">Recent Alerts</h4>
+                     <div className="space-y-4 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar">
+                        {adminStats?.notifications?.map((n: any) => (
+                          <div key={n.id} className="group relative pr-8">
+                             <div className="flex items-start gap-3">
+                                <div className={`mt-1 w-2 h-2 rounded-full ${n.type === 'PAYOUT_ISSUED' ? 'bg-brand-yellow' : 'bg-blue-500'}`} />
+                                <div>
+                                   <p className="font-black text-xs uppercase tracking-tight">{n.title}</p>
+                                   <p className="text-[10px] text-slate-400 font-bold leading-tight">{n.message}</p>
+                                </div>
+                             </div>
+                          </div>
+                        ))}
+                     </div>
+                   </motion.div>
+                 )}
+               </AnimatePresence>
+            </div>
+
             <button 
                onClick={() => { fetchPayoutHistory(); fetchAdminStats(); }}
                className="p-3 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all hover:scale-105 active:scale-95"
@@ -150,22 +227,28 @@ export default function Dashboard() {
            <div className="bg-white/5 border border-white/10 rounded-[32px] p-8 overflow-hidden relative group">
               <div className="flex items-center gap-3 mb-6">
                  <Layers className="w-5 h-5 text-brand-yellow" />
-                 <h3 className="font-black uppercase text-xs tracking-widest text-slate-400 italic">Disruption Heatmap</h3>
+                 <h3 className="font-black uppercase text-xs tracking-widest text-slate-400 italic font-medium">Disruption Zones</h3>
               </div>
               
               <div className="space-y-4">
-                 {adminStats?.heatmap.slice(0, 3).map((zone: any, i: number) => (
-                   <div key={i} className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                         <div className="w-2 h-2 rounded-full bg-brand-yellow animate-ping" />
-                         <p className="text-xs font-black uppercase text-slate-300">{zone.city}</p>
+                 {adminStats?.heatmap && adminStats.heatmap.length > 0 ? (
+                    adminStats.heatmap.slice(0, 4).map((zone: any, i: number) => (
+                      <div key={i} className="flex items-center justify-between">
+                         <div className="flex items-center gap-3">
+                            <div className="w-2 h-2 rounded-full bg-brand-yellow animate-ping" />
+                            <p className="text-xs font-black uppercase text-slate-300">{zone.city}</p>
+                         </div>
+                         <div className="h-1 flex-grow mx-4 bg-white/5 rounded-full overflow-hidden">
+                            <div className="h-full bg-brand-yellow/50" style={{ width: `${Math.min(zone.claims * 10, 100)}%` }} />
+                         </div>
+                         <p className="text-xs font-black text-slate-500">{zone.claims} Claims</p>
                       </div>
-                      <div className="h-1 flex-grow mx-4 bg-white/5 rounded-full overflow-hidden">
-                         <div className="h-full bg-brand-yellow/50" style={{ width: `${(zone.claims / 10) * 100}%` }} />
-                      </div>
-                      <p className="text-xs font-black text-slate-500">{zone.claims} Claims</p>
-                   </div>
-                 ))}
+                    ))
+                 ) : (
+                    <div className="py-8 text-center opacity-20">
+                       <p className="text-[10px] font-black uppercase tracking-widest">No Active Breaches</p>
+                    </div>
+                 )}
               </div>
            </div>
 
@@ -253,7 +336,7 @@ export default function Dashboard() {
                        </div>
                        <div className="bg-brand-dark/10 backdrop-blur-md rounded-2xl p-5 border border-brand-dark/10">
                           <p className="text-[10px] font-black text-brand-dark/50 uppercase tracking-widest mb-1 italic">Data Integrity</p>
-                          <p className="text-3xl font-black text-brand-dark tracking-tighter italic">IMD-CONFIRMED</p>
+                          <p className="text-3xl font-black text-brand-dark tracking-tighter italic uppercase">Authenticated</p>
                        </div>
                     </div>
                   </div>
@@ -268,7 +351,7 @@ export default function Dashboard() {
                     <h3 className="font-black uppercase text-xs tracking-widest text-slate-400 italic">Parametric Audit Log</h3>
                  </div>
                  <div className="flex gap-2">
-                    <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[10px] font-black text-slate-400">SHRAM-v2.5 (MODERN)</div>
+                    <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[10px] font-black text-slate-400">SHRAM-v3.0 (MODERN)</div>
                  </div>
               </div>
 
@@ -283,18 +366,18 @@ export default function Dashboard() {
                         className="bg-white/5 border border-white/5 rounded-2xl p-5 flex items-center justify-between hover:bg-white/10 transition-all hover:border-brand-yellow/30"
                       >
                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center font-black text-brand-yellow text-xs shadow-inner">
-                               SIM
+                            <div className="w-12 h-12 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center font-black text-brand-yellow text-xs shadow-inner uppercase tracking-widest">
+                               {p.trigger_type?.slice(0, 3)}
                             </div>
                             <div>
-                               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-0.5 italic">Transaction Type</p>
+                               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-0.5 italic">{p.user_name || 'Worker'}</p>
                                <p className="font-black text-lg tracking-tighter uppercase leading-none">{p.trigger_type}</p>
                             </div>
                          </div>
 
                          <div className="hidden sm:block text-center">
                             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-0.5 italic">Recipient ID</p>
-                            <p className="font-bold text-sm tracking-widest opacity-60">UPI: user@okaxis</p>
+                            <p className="font-bold text-sm tracking-widest opacity-60 uppercase">UPI: {p.user_upi || 'Real UPI Active'}</p>
                          </div>
 
                          <div className="text-right">
@@ -304,9 +387,9 @@ export default function Dashboard() {
                       </motion.div>
                    ))
                  ) : (
-                   <div className="h-full flex flex-col items-center justify-center opacity-20 py-20">
-                      <BarChart3 className="w-20 h-20 mb-4" />
-                      <p className="font-black uppercase tracking-[0.3em] text-xs">No Payout Telemetry</p>
+                   <div className="h-full flex flex-col items-center justify-center py-20">
+                      <BarChart3 className="w-20 h-20 mb-4 opacity-10" />
+                      <p className="font-black uppercase tracking-[0.3em] text-xs opacity-20">No Payout Telemetry</p>
                    </div>
                  )}
               </div>
@@ -325,7 +408,7 @@ function Loader() {
        <div className="flex gap-1">
           {[1, 2, 3].map(i => <motion.div key={i} animate={{ opacity: [0.2, 1, 0.2] }} transition={{ repeat: Infinity, duration: 1.5, delay: i * 0.2 }} className="w-1.5 h-1.5 bg-brand-yellow rounded-full shadow-[0_0_8px_rgba(250,204,21,0.5)]" />)}
        </div>
-       <p className="text-[8px] font-black uppercase tracking-[0.4em] text-slate-500">Global Monitoring Active</p>
+       <p className="text-[8px] font-black uppercase tracking-[0.4em] text-slate-500">Live Global Monitoring</p>
     </div>
   );
 }

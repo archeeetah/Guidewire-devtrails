@@ -14,15 +14,6 @@ export default function Hero() {
 
       <div className="container px-6 mx-auto relative z-10">
         <div className="max-w-4xl mx-auto text-center mb-24">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full bg-brand-slate text-brand-yellow text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-brand-slate/10"
-          >
-            <Zap className="w-4 h-4 fill-current" />
-            <span>Parametric Protection v2.0</span>
-          </motion.div>
           
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}

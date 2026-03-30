@@ -58,6 +58,8 @@ class PayoutResponse(BaseModel):
     trigger_type: str
     trigger_reason: str
     processed_at: datetime
+    user_name: Optional[str] = None
+    user_upi: Optional[str] = None
 
     class Config:
         from_attributes = True

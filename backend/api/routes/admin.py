@@ -24,15 +24,44 @@ def get_admin_stats(db: Session = Depends(get_db)):
     total_workers = db.query(User).count()
     active_policies = db.query(Policy).filter(Policy.is_active == True).count()
 
-    # 3. Claims Heatmap Distribution (Mocked for Demo Visualization)
-    # In production, this would be grouped by city and coordinates
-    heatmap_data = [
-        {"city": "Mumbai", "claims": db.query(Payout).count() // 2, "lat": 19.0760, "lng": 72.8777},
-        {"city": "Delhi", "claims": db.query(Payout).count() // 4, "lat": 28.6139, "lng": 77.2090},
-        {"city": "Bangalore", "claims": 5, "lat": 12.9716, "lng": 77.5946},
-        {"city": "Chennai", "claims": 3, "lat": 13.0827, "lng": 80.2707},
-        {"city": "Pune", "claims": db.query(Payout).count() // 10, "lat": 18.5204, "lng": 73.8567},
-    ]
+    # 3. Claims Heatmap Distribution (Aggregated from Real Data)
+    # Group payouts by the primary_zone of the users
+    claims_by_zone = db.query(
+        User.primary_zone, 
+        func.count(Payout.id).label("claims_count")
+    ).join(Payout, User.id == Payout.user_id).group_by(User.primary_zone).all()
+
+    heatmap_data = []
+    for zone, count in claims_by_zone:
+        heatmap_data.append({
+            "city": zone,
+            "claims": count
+        })
+
+    # If no real data yet, return empty list (No Dummy Data policy)
+    
+    # 4. System Alerts & Live Notifications
+    # We create a live feed of what's happening
+    recent_payouts = db.query(Payout, User.name).join(User, Payout.user_id == User.id).order_by(Payout.processed_at.desc()).limit(3).all()
+    
+    notifications = []
+    for p, name in recent_payouts:
+        notifications.append({
+            "id": p.id,
+            "type": "PAYOUT_ISSUED",
+            "title": f"₹{p.amount} Disbursed",
+            "message": f"Parametric payout triggered for {name} ({p.trigger_type})",
+            "timestamp": p.processed_at.isoformat()
+        })
+    
+    if not notifications:
+        notifications.append({
+            "id": 0,
+            "type": "SYSTEM_READY",
+            "title": "Global Monitoring Online",
+            "message": "All parametric sensors are synchronized with IMD Met-Core.",
+            "timestamp": func.now()
+        })
 
     return {
         "liquidity": {
@@ -46,6 +75,7 @@ def get_admin_stats(db: Session = Depends(get_db)):
             "active_policies": active_policies
         },
         "heatmap": heatmap_data,
+        "notifications": notifications,
         "system_status": "OPTIMAL",
         "last_sync": "IMD (India Meteorological Department) - Verified"
     }
