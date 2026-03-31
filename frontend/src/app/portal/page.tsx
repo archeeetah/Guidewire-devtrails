@@ -7,9 +7,12 @@ import {
   Zap, History, Navigation, Bell, Activity, ChevronRight, Home 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSensorTelemetry } from "@/hooks/useSensorTelemetry";
 
 export default function WorkerPortal() {
   const [user, setUser] = useState<any>(null);
+  const { isCapturing } = useSensorTelemetry(user?.id);
+
   const [policies, setPolicies] = useState<any[]>([]);
   const [quote, setQuote] = useState<any>(null);
   const [payouts, setPayouts] = useState<any[]>([]);
@@ -338,12 +341,16 @@ export default function WorkerPortal() {
                       </div>
                       <div>
                         <p className="font-bold text-sm text-slate-900 tracking-tight">{p.trigger_type}</p>
-                        <p className="text-xs font-medium text-slate-500 leading-none mt-0.5">Satellite Verification</p>
+                        <p className="font-mono text-[9px] text-slate-400 mt-1 uppercase">Ref: {p.transaction_id ? p.transaction_id.substring(0,14) : '...'}</p>
                       </div>
                     </div>
                     <div className="text-right">
                        <p className="font-bold text-slate-900">₹{p.amount}</p>
-                       <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-widest leading-none mt-1">Paid Out</p>
+                       <p className={`text-[9px] font-bold uppercase tracking-tighter px-2 py-0.5 rounded-full inline-block ${
+                          p.payout_status === 'SETTLED' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
+                       }`}>
+                          {p.payout_status || 'PAID'}
+                       </p>
                     </div>
                  </div>
                ))

@@ -7,8 +7,8 @@ from models.user import User
 from models.policy import Policy
 from models.payout import Payout
 from models.telemetry_log import TelemetryScanLog
-from api.routes import policies, triggers, users, payouts, admin
-from api.routes import monitoring
+from models.telemetry_data import TelemetryData
+from api.routes import policies, triggers, users, payouts, admin, monitoring, telemetry
 
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -70,6 +70,8 @@ app.include_router(users.router, prefix="/api")
 app.include_router(payouts.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
 app.include_router(monitoring.router, prefix="/api")
+app.include_router(telemetry.router, prefix="/api")
+
 
 @app.get("/")
 def read_root():

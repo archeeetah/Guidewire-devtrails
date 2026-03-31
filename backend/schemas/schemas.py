@@ -57,9 +57,13 @@ class PayoutResponse(BaseModel):
     amount: float
     trigger_type: str
     trigger_reason: str
+    payout_status: str
+    transaction_id: Optional[str] = None
+    confidence_score: float = 1.0
     processed_at: datetime
     user_name: Optional[str] = None
     user_upi: Optional[str] = None
+
 
     class Config:
         from_attributes = True

@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   Zap, AlertCircle, Terminal, ShieldAlert, Globe, 
-  BarChart3, Settings, Play, RefreshCw, Layers, Loader2, Bell, CheckCircle2, CloudRain
+  BarChart3, Settings, Play, RefreshCw, Layers, Loader2, Bell, CheckCircle2, CloudRain,
+  Cpu, History, Activity
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -42,6 +43,9 @@ export default function Dashboard() {
     zone: "Mumbai"
   });
   const [result, setResult] = useState<any>(null);
+  const [scannerStatus, setScannerStatus] = useState<any>(null);
+  const [scanLogs, setScanLogs] = useState<any[]>([]);
+  const [isTogglingScanner, setIsTogglingScanner] = useState(false);
   const lastAlertId = useRef<number | string>(0);
 
   const fetchAdminStats = async () => {
@@ -78,6 +82,35 @@ export default function Dashboard() {
       setPayoutHistory(data);
     } catch (err) {
       console.error("Failed to fetch payout history", err);
+    }
+  };
+
+  const fetchMonitoringData = async () => {
+    try {
+      const [statusRes, logsRes] = await Promise.all([
+        fetch("/api/monitoring/status"),
+        fetch("/api/monitoring/logs")
+      ]);
+      const statusData = await statusRes.json();
+      const logsData = await logsRes.json();
+      setScannerStatus(statusData.scanner);
+      setScanLogs(logsData.value || logsData);
+    } catch (err) {
+      console.error("Failed to fetch monitoring data", err);
+    }
+  };
+
+  const handleToggleScanner = async () => {
+    setIsTogglingScanner(true);
+    try {
+      const res = await fetch("/api/monitoring/toggle", { method: "POST" });
+      const data = await res.json();
+      toast.success(data.message);
+      fetchMonitoringData();
+    } catch (err) {
+      toast.error("Failed to toggle scanner");
+    } finally {
+      setIsTogglingScanner(false);
     }
   };
 
@@ -120,7 +153,11 @@ export default function Dashboard() {
   useEffect(() => {
     fetchPayoutHistory();
     fetchAdminStats();
-    const interval = setInterval(fetchAdminStats, 10000);
+    fetchMonitoringData();
+    const interval = setInterval(() => {
+      fetchAdminStats();
+      fetchMonitoringData();
+    }, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -311,6 +348,91 @@ export default function Dashboard() {
                  )}
               </div>
            </div>
+
+           {/* Autonomous Monitoring Panel */}
+           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm overflow-hidden relative">
+              <div className="flex items-center justify-between mb-6">
+                 <div className="flex items-center gap-3">
+                    <Cpu className="w-5 h-5 text-slate-400" />
+                    <h3 className="font-semibold text-slate-700">Autonomous Monitoring</h3>
+                 </div>
+                 <div className="flex items-center gap-2">
+                    <div className={`w-2 h-2 rounded-full ${scannerStatus?.is_running ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                       {scannerStatus?.is_running ? 'Active' : 'Paused'}
+                    </span>
+                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                 <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase mb-1">Total Scans</p>
+                    <p className="font-bold text-slate-800">{scannerStatus?.total_scans || 0}</p>
+                 </div>
+                 <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase mb-1">Auto Payouts</p>
+                    <p className="font-bold text-blue-600">{scannerStatus?.total_auto_payouts || 0}</p>
+                 </div>
+              </div>
+
+              <div className="space-y-3 mb-6">
+                 <div className="flex justify-between items-center text-xs">
+                    <span className="text-slate-500">Last Scan</span>
+                    <span className="font-medium text-slate-700">
+                       {scannerStatus?.last_scan_at ? new Date(scannerStatus.last_scan_at).toLocaleTimeString() : 'Never'}
+                    </span>
+                 </div>
+                 <div className="flex justify-between items-center text-xs">
+                    <span className="text-slate-500">Next Scan</span>
+                    <span className="font-medium text-blue-600">
+                       {scannerStatus?.next_scan_at ? new Date(scannerStatus.next_scan_at).toLocaleTimeString() : 'N/A'}
+                    </span>
+                 </div>
+              </div>
+
+              <button 
+                 onClick={handleToggleScanner}
+                 disabled={isTogglingScanner}
+                 className={`w-full py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-sm flex items-center justify-center gap-2 ${
+                    scannerStatus?.is_running 
+                    ? 'bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100' 
+                    : 'bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100'
+                 }`}
+              >
+                 {isTogglingScanner ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3 fill-current" />}
+                 {scannerStatus?.is_running ? 'Stop Autonomous Scanner' : 'Start Autonomous Scanner'}
+              </button>
+
+              <div className="mt-8">
+                 <div className="flex items-center gap-2 mb-4">
+                    <History className="w-4 h-4 text-slate-400" />
+                    <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Recent Scan Logs</h4>
+                 </div>
+                 <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                    {scanLogs.length > 0 ? (
+                       scanLogs.map((log, i) => (
+                          <div key={i} className="p-3 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-between group hover:border-slate-200 transition-colors">
+                             <div className="flex flex-col gap-0.5">
+                                <span className="text-[10px] font-bold text-slate-800">{log.zone}</span>
+                                <span className="text-[9px] text-slate-400 font-medium">{new Date(log.scanned_at).toLocaleTimeString()} • {log.scan_type}</span>
+                             </div>
+                             <div className="text-right">
+                                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-tighter ${
+                                   log.status === 'disrupted' ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'
+                                }`}>
+                                   {log.status}
+                                </span>
+                             </div>
+                          </div>
+                       ))
+                    ) : (
+                       <div className="py-6 text-center">
+                          <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">No logs yet</p>
+                       </div>
+                    )}
+                 </div>
+              </div>
+           </div>
         </div>
 
         {/* Right Column */}
@@ -437,13 +559,28 @@ export default function Dashboard() {
                            </div>
 
                            <div className="col-span-12 md:col-span-3 w-full">
-                              <p className="font-mono text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded inline-block">UPI_{p.id.substring(0,8)}</p>
+                              <p className="font-mono text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded inline-block">
+                                {p.transaction_id || `REF_${p.id}`}
+                              </p>
                            </div>
 
-                           <div className="col-span-12 md:col-span-3 w-full text-left md:text-right">
-                              <p className="font-bold text-slate-900">₹{p.amount}</p>
-                              <p className="text-[10px] font-medium text-emerald-500 uppercase">Settled</p>
-                           </div>
+                            <div className="col-span-12 md:col-span-3 w-full flex items-center justify-end md:justify-start gap-4">
+                               <div className="text-right md:text-left flex-grow">
+                                  <p className="font-bold text-slate-900">₹{p.amount}</p>
+                                  <p className={`text-[10px] font-bold uppercase tracking-tighter px-2 py-0.5 rounded-full inline-block ${
+                                     p.payout_status === 'SETTLED' ? 'bg-emerald-100 text-emerald-600' : (p.payout_status === 'FRAUD_FLAGGED' ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-600')
+                                  }`}>
+                                     {p.payout_status || 'PROCESSING'}
+                                  </p>
+                               </div>
+                               <div className="flex flex-col items-end">
+                                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Trust</span>
+                                  <span className={`text-sm font-black mt-1 ${p.confidence_score > 0.8 ? 'text-emerald-500' : (p.confidence_score > 0.4 ? 'text-amber-500' : 'text-rose-500')}`}>
+                                     {Math.round(p.confidence_score * 100)}%
+                                  </span>
+                               </div>
+                            </div>
+
                         </div>
                      ))
                    ) : (
