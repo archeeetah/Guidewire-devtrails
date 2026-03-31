@@ -3,12 +3,16 @@ from models.telemetry_data import TelemetryData
 from services.external_api import DisruptionAPIClient
 from services.payment_gateway import RazorpayXClient
 from services.mobility_intelligence import MobilityIntelligence
+from models.payout import Payout
+from models.policy import Policy
+from sqlalchemy.orm import Session
+from datetime import datetime, timedelta
 from typing import List
 import logging
 
 logger = logging.getLogger("shramshield.engine")
 
-def evaluate_disrupted_zones(db: Session, zone: str) -> List[dict]:
+def evaluate_disrupted_zones(db: Session, zone: str) -> dict:
     """
     The Core Parametric Trigger Engine (v3):
     1. Checks external conditions (Weather/AQI).
@@ -33,7 +37,14 @@ def evaluate_disrupted_zones(db: Session, zone: str) -> List[dict]:
         return {"status": "success", "message": "No disruption thresholds met.", "telemetry": telemetry, "payouts": []}
 
     # Query active policies for this zone, joining user to get UPI info
-    active_policies = db.query(Policy, User).join(User, Policy.user_id == User.id).filter(Policy.is_active == True).all()
+    # USE with_for_update() to create a row-level lock on the policies being evaluated.
+    active_policies = (
+        db.query(Policy, User)
+        .join(User, Policy.user_id == User.id)
+        .filter(Policy.is_active == True)
+        .with_for_update(nowait=True) # Prevent race conditions across multi-node scanners
+        .all()
+    )
 
     for policy_record in active_policies:
         policy = policy_record[0]
@@ -42,6 +53,19 @@ def evaluate_disrupted_zones(db: Session, zone: str) -> List[dict]:
         triggered = False
         reason = ""
         trigger_type = ""
+        
+        # EDGE CASE: Payout Idempotency
+        # Check if a payout was ALREADY processed for this policy in the last 4 hours
+        # to avoid double-payouts if the scanner triggers twice.
+        existing_payout = (
+            db.query(Payout)
+            .filter(Payout.policy_id == policy.id)
+            .filter(Payout.processed_at >= datetime.utcnow() - timedelta(hours=4))
+            .first()
+        )
+        if existing_payout:
+            logger.info(f"IDEMPOTENCY: Skipping. Payout already exists for Policy ID {policy.id}")
+            continue
         
         if policy.rain_trigger_active and rules_met["rain_trigger_met"]:
             triggered = True

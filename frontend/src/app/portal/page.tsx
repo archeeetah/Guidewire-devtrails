@@ -117,6 +117,17 @@ export default function WorkerPortal() {
 
   const handlePurchase = async () => {
     if (!user || !quote) return;
+    
+    // EDGE CASE: Zero-UPI Purchase Prevention
+    if (!user.upi_id) {
+       toast.error("Security Alert: UPI ID Missing", {
+         description: "Automated settlements require a valid UPI identifier. Setup your payout details in Preferences.",
+         icon: <Smartphone className="w-5 h-5" />
+       });
+       setActiveTab('preferences');
+       return;
+    }
+
     setPurchasing(true);
     try {
       const res = await fetch("/api/policies/", {
@@ -129,7 +140,9 @@ export default function WorkerPortal() {
           premium_amount: quote.premium_amount,
           rain_trigger_active: true,
           aqi_trigger_active: true,
-          zone_lockout_active: true
+          zone_lockout_active: true,
+          // Sync Timestamp in ISO format for backend normalization
+          purchased_at: new Date().toISOString()
         })
       });
       if (res.ok) {
@@ -212,10 +225,19 @@ export default function WorkerPortal() {
                      </div>
                      <h3 className="text-3xl font-black text-slate-900 mb-4 tracking-tighter uppercase">{t.no_shield}</h3>
                      <p className="text-base text-slate-500 font-medium leading-relaxed mb-10 max-w-sm mx-auto">Income risk detected for today. Activate your stabilization shield.</p>
+                     
+                     {/* UPI GUARDRAIL: Highlight if missing */}
+                     {!user?.upi_id && (
+                        <div className="mb-8 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-3 text-left max-w-sm mx-auto">
+                           <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                           <p className="text-[10px] font-bold text-amber-800 uppercase tracking-tight">Complete your Payout Settings in Preferences to enable one-click protection.</p>
+                        </div>
+                     )}
+
                      {quote && (
                         <button 
                           onClick={handlePurchase} disabled={purchasing}
-                          className="px-12 py-5 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl hover:bg-black transition-all flex items-center justify-center gap-3 mx-auto"
+                          className={`px-12 py-5 rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl transition-all flex items-center justify-center gap-3 mx-auto ${user?.upi_id ? 'bg-slate-900 text-white hover:bg-black' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
                         >
                           {purchasing ? <Loader2 className="w-5 h-5 animate-spin" /> : <ShieldCheck className="w-5 h-5" />}
                           {t.activate_shield} (₹{quote.premium_amount})

@@ -24,6 +24,17 @@ class MobilityIntelligence:
         points = len(telemetry_batch)
         suspicious_signals = []
         
+        # EDGE CASE: Signal Padding
+        # If total telemetry points in this disruption window are < 5,
+        # we do not have enough drift/variance to confirm trust or fraud.
+        if points < 5:
+            return {
+                "score": 0.50, # Neutral baseline
+                "status": "PENDING_TELEMETRY", 
+                "signals": ["Insufficient trajectory density for parametric cross-check"],
+                "sample_points": points
+            }
+        
         # 1. IMU SENSOR NOISE CHECK (Anti-Emulator)
         # Real devices have constant micro-variations (thermal noise + bike idle).
         # Spoofing emulators often have perfectly constant (0.00) or uniform accel data.
