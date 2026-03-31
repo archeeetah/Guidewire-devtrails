@@ -1,3 +1,6 @@
+import random
+from datetime import datetime
+
 def calculate_risk_premium(platform: str, zone: str) -> dict:
     """
     ShramShield AI Risk Scoring Engine v2.0 (Dynamic).
@@ -49,4 +52,37 @@ def calculate_risk_premium(platform: str, zone: str) -> dict:
         "final_weekly_premium": final_premium,
         "recommended_triggers": recommended_triggers,
         "risk_factors": risk_factors
+    }
+
+def generate_zone_forecast(zone: str) -> dict:
+    """
+    ShramShield Intelligence Forecast Core (V2/Next-Gen).
+    Simulates AI-driven hyper-local probability forecasting for imminent disruptions.
+    """
+    zone_hash = sum(ord(c) for c in zone) % 100
+    
+    # Generate stable probability markers
+    if zone_hash > 70:
+        event = "Flash Flood / Coastal Surge"
+        probability = 78 + (random.random() * 10)
+        timeframe = "next 2 hrs"
+        severity = "CRITICAL"
+    elif zone_hash > 40:
+        event = "Severe Traffic Gridlock"
+        probability = 65 + (random.random() * 15)
+        timeframe = "next 4 hrs"
+        severity = "HIGH"
+    else:
+        event = "Stable Conditions"
+        probability = 15 + (random.random() * 5)
+        timeframe = "next 12 hrs"
+        severity = "OPTIMAL"
+
+    return {
+        "zone": zone,
+        "forecast_event": event,
+        "probability_percent": round(probability, 1),
+        "timeframe": timeframe,
+        "severity_level": severity,
+        "generated_at": datetime.utcnow().isoformat()
     }

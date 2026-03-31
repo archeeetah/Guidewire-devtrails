@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { 
   CloudLightning, MapPin, ShieldCheck, CheckCircle2, 
   CloudRain, AlertCircle, Loader2, ArrowRight, ArrowUpRight, 
   Zap, History, Navigation, Bell, Activity, ChevronRight, Home, Globe, Volume2, 
-  Menu, Settings, HelpCircle, Map, Heart, PieChart, ShieldAlert, User, LogOut, ChevronDown, Terminal, ExternalLink, Calendar, Info, Users, UserCheck, Smartphone, Shield, Radar, BarChart3
+  Menu, Settings, HelpCircle, Map, Heart, PieChart, ShieldAlert, User, LogOut, ChevronDown, Terminal, ExternalLink, Calendar, Info, Users, UserCheck, Smartphone, Shield, Radar, BarChart3,
+  SunSnow, TriangleAlert
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSensorTelemetry } from "@/hooks/useSensorTelemetry";
@@ -28,6 +29,12 @@ export default function WorkerPortal() {
   const [loading, setLoading] = useState(true);
   const [isKycVerified, setIsKycVerified] = useState(false);
   const [purchasing, setPurchasing] = useState(false);
+  
+  // Next-Gen Feature States
+  const [aiForecast, setAiForecast] = useState<any>(null);
+  const [crashDetected, setCrashDetected] = useState<any>(null);
+  const [sosCountdown, setSosCountdown] = useState(15);
+  const crashTimerRef = useRef<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -89,17 +96,74 @@ export default function WorkerPortal() {
   };
 
   const handleSOS = () => {
-    navigator.geolocation.getCurrentPosition((pos) => {
-      const { latitude, longitude } = pos.coords;
-      toast.error("SOS Field Dispatch Triggered", {
-        description: `Emergency response unit notified with your coordinates: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
-        icon: <ShieldAlert className="w-5 h-5 text-white" />,
-        className: "bg-rose-600 text-white border-0"
-      });
-      speak("Emergency assist triggered. Response team notified with your location.");
-      console.log(`SOS LOG: UID ${user?.id} at ${latitude}, ${longitude}`);
-    });
+    if (navigator.geolocation) {
+       navigator.geolocation.getCurrentPosition((pos) => {
+          const { latitude, longitude } = pos.coords;
+          toast.error("SOS Field Dispatch Triggered", {
+             description: `Emergency response unit notified with your coordinates: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
+             icon: <ShieldAlert className="w-5 h-5 text-white" />,
+             className: "bg-rose-600 text-white border-0"
+          });
+          speak("Emergency assist triggered. Response team notified with your location.");
+          console.log(`SOS LOG: UID ${user?.id} at ${latitude}, ${longitude}`);
+       });
+    }
   };
+
+  // NEXT GEN: Cancel SOS Request
+  const cancelCrashSOS = () => {
+     setCrashDetected(null);
+     setSosCountdown(15);
+     if (crashTimerRef.current) clearInterval(crashTimerRef.current);
+     toast.success("Emergency Dispatch Cancelled. Resuming Telemetry.");
+  };
+
+  // NEXT GEN: Poll Backend for Crash Detection Status
+  useEffect(() => {
+    let poller: any;
+    if (activeTab === 'dashboard' && user) {
+      poller = setInterval(() => {
+        // Poll the new analyze-crash endpoint every 10 seconds
+        fetch(`/api/telemetry/analyze-crash/${user.id}`, { method: "POST" })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status === "CRASH_DETECTED" && !crashDetected) {
+               setCrashDetected(data);
+               speak("Critical G-Force spike detected. Initiating emergency countdown.");
+            }
+          }).catch(err => console.error("Crash analyze error", err));
+      }, 10000);
+    }
+    return () => clearInterval(poller);
+  }, [activeTab, user, crashDetected]);
+
+  // NEXT GEN: Handle SOS Countdown Timer
+  useEffect(() => {
+    if (crashDetected) {
+      crashTimerRef.current = setInterval(() => {
+        setSosCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(crashTimerRef.current);
+            handleSOS();
+            setCrashDetected(null);
+            return 15;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(crashTimerRef.current);
+  }, [crashDetected]);
+
+  // NEXT GEN: Fetch Predictive Weather Forecast
+  useEffect(() => {
+     if (user?.primary_zone) {
+       fetch(`/api/telemetry/forecast/${user.primary_zone}`)
+         .then(res => res.json())
+         .then(data => setAiForecast(data))
+         .catch(err => console.error("Forecast Error", err));
+     }
+  }, [user]);
 
   const handleKYC = () => {
     toast.promise(
@@ -180,7 +244,7 @@ export default function WorkerPortal() {
             <div className="lg:col-span-12 xl:col-span-8 space-y-10">
                
                {/* Production Header: Push Notification Simulator Preview */}
-               <div className="bg-blue-50 border border-blue-100 rounded-3xl p-6 flex items-center justify-between">
+               <div className="bg-blue-50 border border-blue-100 rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                   <div className="flex items-center gap-4">
                      <div className="p-3 bg-white rounded-2xl shadow-sm">
                         <Radar className="w-5 h-5 text-blue-600 animate-spin-slow" />
@@ -190,9 +254,17 @@ export default function WorkerPortal() {
                         <p className="text-sm font-bold text-slate-900 leading-none">Passive background monitoring is ACTIVE</p>
                      </div>
                   </div>
-                  <div className="hidden sm:block text-right">
-                     <p className="text-[9px] font-black text-emerald-500 uppercase">Coverage Node: Verified</p>
-                  </div>
+                  
+                  {/* NEXT GEN: AI Forecast Integration */}
+                  {aiForecast && (
+                     <div className={`p-4 rounded-2xl flex items-center gap-4 border ${aiForecast.severity_level === 'CRITICAL' ? 'bg-red-50 border-red-200' : 'bg-white border-blue-100'}`}>
+                        <SunSnow className={`w-6 h-6 ${aiForecast.severity_level === 'CRITICAL' ? 'text-red-500' : 'text-blue-500'}`} />
+                        <div>
+                           <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">AI Forecast ({aiForecast.timeframe})</p>
+                           <p className={`text-xs font-black uppercase tracking-tight ${aiForecast.severity_level === 'CRITICAL' ? 'text-red-600' : 'text-slate-900'}`}>{aiForecast.probability_percent}% {aiForecast.forecast_event}</p>
+                        </div>
+                     </div>
+                  )}
                </div>
 
                {/* Active Shield Card */}
@@ -605,7 +677,35 @@ export default function WorkerPortal() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-50 font-sans selection:bg-blue-100 selection:text-blue-900 pb-20 lg:pb-0">
+    <main className="min-h-screen bg-slate-50 font-sans selection:bg-blue-100 selection:text-blue-900 pb-20 lg:pb-0 relative">
+
+      {/* NEXT GEN: Crash SOS Takeover Overlay */}
+      <AnimatePresence>
+        {crashDetected && (
+           <motion.div 
+             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+             className="fixed inset-0 z-[100] bg-rose-600 text-white flex flex-col items-center justify-center p-8 text-center"
+           >
+              <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center shadow-2xl mb-12 animate-pulse">
+                 <TriangleAlert className="w-16 h-16 text-rose-600" />
+              </div>
+              <h2 className="text-5xl font-black tracking-tighter uppercase italic mb-4">Collision Detected</h2>
+              <p className="text-xl font-medium mb-16 max-w-md">Our telemetry engine detected an abnormal {crashDetected.force}G spike on the {crashDetected.axis} axis. Are you safe?</p>
+              
+              <div className="mb-16">
+                 <p className="text-[12px] font-black uppercase tracking-[4px] opacity-70 mb-4">Auto-Dispatching SOS In</p>
+                 <span className="text-8xl font-black tracking-tighter tabular-nums">{sosCountdown}</span>
+              </div>
+              
+              <button 
+                onClick={cancelCrashSOS}
+                className="px-16 py-6 bg-slate-900 text-white rounded-full text-sm font-black uppercase tracking-widest shadow-2xl hover:bg-black transition-transform active:scale-95"
+              >
+                 I am safe. Cancel Alarm.
+              </button>
+           </motion.div>
+        )}
+      </AnimatePresence>
       
       {/* Side Navigation */}
       <aside className="fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-slate-200 z-50 hidden lg:flex flex-col p-6 shadow-sm">
