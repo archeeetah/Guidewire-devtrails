@@ -112,6 +112,29 @@ input, select, textarea {
   contain: paint;
 }
 
+/* ========== CUSTOM UTILITIES ========== */
+
+/* Hide scrollbars for carousels */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Premium Glowing Shadow */
+.shadow-glow {
+  box-shadow: 0 0 15px -3px var(--tw-shadow-color);
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 /* Fix overflow on mobile */
 html, body {
   overflow-x: hidden;
