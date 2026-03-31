@@ -1,12 +1,26 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
-
 from core.database import get_db
 from models.telemetry_log import TelemetryScanLog
 from services.scheduler import get_scheduler_status, start_scheduler, stop_scheduler
+from services.ai_optimizer import AIEarningsOptimizer
 
 router = APIRouter(prefix="/monitoring", tags=["Autonomous Monitoring"])
+
+@router.get("/recommendations")
+def get_ai_recommendations(lat: float = None, lon: float = None):
+    """
+    Returns AI-curated 'Earnings Stability Index' (ESI) for nearby zones.
+    Guides workers to position themselves for maximum parametric protection.
+    """
+    recs = AIEarningsOptimizer.get_zone_recommendations(lat, lon)
+    return {
+        "status": "success",
+        "timestamp": 1234567890, # mock
+        "recommendations": recs,
+        "market_analysis": AIEarningsOptimizer.get_market_analysis()
+    }
 
 
 @router.get("/status")
