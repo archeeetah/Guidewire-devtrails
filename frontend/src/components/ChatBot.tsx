@@ -20,62 +20,70 @@ const LANG_OPTIONS: { value: Language; label: string }[] = [
   { value: "ta", label: "தமிழ்" },
 ];
 
-const TRANSLATIONS = {
+const INTENTS = {
   en: {
     title: "ShramShield AI",
-    status: "Available 24/7",
-    placeholder: "Ask about coverage or payouts...",
-    footer: "AI Verified Parametric System",
-    greeting: "Hello! I'm the ShramShield AI Assistant. You can ask me general questions about coverage, or check your payment/delay status by providing your registered phone number.",
-    clarify: "I'm sorry, I didn't quite catch that. Could you clarify your question about coverage or payouts?",
-    payment_processed: "I have checked the system for the provided number. Your payment was processed automatically via the IMD rainfall trigger but is currently pending in the UPI gateway queue. It should reflect in your account within the next 2-4 hours. We apologize for the delay!",
-    payment_ask_number: "To check on a delayed payment or specific transaction status, please type your registered 10-digit phone number so I can look it up in the parametric ledger.",
-    how_it_works: "ShramShield works by monitoring live satellite and weather data. If extreme weather or a curfew happens in your zone, we automatically trigger a payout to your UPI ID!",
-    pricing: "Our plans start at just ₹49/week for our Flex Lite protection, passing up to ₹99/week for the Gig Pro coverage.",
-    support: "If you need human assistance, you can email us at help@shramshield.in or call our 24/7 hotline at 1800-SHRAM-HELP.",
-    hello: "Hi there! How can I assist you with your ShramShield protection today?"
+    status: "Active Safety Bot",
+    greeting: ["Hello! I'm your ShramShield AI Assistant. How can I help you protect your earnings today?", "Hi there! I'm here to help with your weekly coverage and payouts. What's on your mind?"],
+    payout_status: {
+      ask_number: "To check your parametric payout status, please provide your 10-digit registered phone number (e.g., 9876543210).",
+      success: "I've checked the parametric ledger. Your payout was triggered by the rainfall sensors and is currently in the UPI processing queue. You should see it in your account within 2-4 hours!",
+      not_found: "I couldn't find an active trigger for that number. Please ensure your weekly plan is active or check if the weather threshold (30mm rain) was met in your zone."
+    },
+    how_it_works: "ShramShield uses real-time weather sensors. If it rains >30mm or heat crosses 45°C in your zone while you're active, we send money to your UPI instantly—no claims needed!",
+    pricing: "Our plans are dynamic! Flex Lite starts at ₹49/week (₹1,500 payout) and our Gig Pro plan is ₹99/week (₹2,500 payout). The exact price depends on your zone's risk history for the upcoming week.",
+    vision_ai: "To verify your ID, please go to the Onboarding page. Our Vision AI will scan your Aadhaar or DL automatically. Make sure the lighting is good!",
+    safety: "Your safety is priority. If AQI is above 400 or rain is heavy, our Risk Radar will alert you. Stay safe, we'll cover the income loss.",
+    clarify: "I'm still learning! Could you ask about payouts, pricing, or how the weather triggers work?",
+    quick_replies: ["💰 Payout Status", "🌧️ How it works?", "📉 Check Prices", "🛡️ Vision AI Help"]
   },
   hinglish: {
     title: "ShramShield AI",
-    status: "24/7 Available",
-    placeholder: "Coverage ya payment ke baare mein puchein...",
-    footer: "AI Verified Parametric System",
-    greeting: "Hello! Main ShramShield AI Assistant hoon. Aap coverage ke baare mein sawal pooch sakte hain, ya apna registered phone number bata kar payment ka status check kar sakte hain.",
-    clarify: "Sorry, mujhe theek se samajh nahi aaya. Kya aap apna sawal thoda clear kar sakte hain?",
-    payment_processed: "Maine system mein aapka number check kar liya hai. Aapka payment auto-process ho gaya tha IMD rain trigger se, par abhi UPI gateway mein pending hai. Ye agle 2-4 hours mein aapke account mein aa jayega. Delay ke liye maafi chahte hain!",
-    payment_ask_number: "Apna delayed payment ya transaction status check karne ke liye, please apna 10-digit registered phone number type karein taaki main ledger mein check kar sakun.",
-    how_it_works: "ShramShield live satellite aur weather data monitor karta hai. Agar aapke zone mein extreme weather ya curfew hota hai, toh hum automatically aapke UPI ID par payout bhej dete hain!",
-    pricing: "Hamare plans bas ₹49/week se start hote hain Flex Lite list ke liye, aur ₹99/week tak jaate hain Gig Pro coverage ke liye.",
-    support: "Agar aapko kisi ki help chahiye, toh aap help@shramshield.in par email kar sakte hain ya hamare 24/7 hotline 1800-SHRAM-HELP par call kar sakte hain.",
-    hello: "Hi! Main aaj aapki ShramShield protection mein kaise help kar sakta hoon?"
+    status: "24/7 Sahayak",
+    greeting: ["Namaste! Main ShramShield AI Assistant hoon. Aaj aapki kamai protect karne mein kaise madad karun?", "Hello! Coverage ya payouts se juda koi bhi sawal ho, toh bejhijhak puchein."],
+    payout_status: {
+      ask_number: "Apna payout status check karne ke liye, please apna 10-digit registered phone number type karein.",
+      success: "Maine ledger check kiya hai. Aapka payout rainfall sensor se trigger ho chuka hai aur abhi UPI queue mein hai. 2-4 hours mein aapke account mein aa jayega!",
+      not_found: "Is number par koi active trigger nahi mila. Check karein ki aapka weekly plan active hai ya nahi, aur weather conditions thresholds se upar thi ya nahi."
+    },
+    how_it_works: "ShramShield real-time weather sensors use karta hai. Agar aapke zone mein 30mm se zyada baarish ya 45°C garmi hoti hai, toh hum turant UPI payout bhejte hain!",
+    pricing: "Humare plans dynamic hain! Flex Lite ₹49/week (₹1,500 payout) se shuru hota hai aur Gig Pro ₹99/week (₹2,500 payout) hai. Exact price aapke zone ke risk par depend karta hai.",
+    vision_ai: "ID verify karne ke liye Onboarding page par jayein. Humara Vision AI aapka Aadhaar ya DL automatically scan kar lega. Lighting achi honi chahiye!",
+    safety: "Aapki safety sabse pehle hai. Agar AQI 400 se upar hai ya baarish tez hai, toh Risk Radar aapko alert karega. Tension na lein, income loss hum handle karenge.",
+    clarify: "Maafi chahte hain! Kya aap payouts, pricing ya parametric triggers ke baare mein pooch sakte hain?",
+    quick_replies: ["💰 Payout Status", "🌧️ Kaise kaam karta hai?", "📉 Plan ki Kimat", "🛡️ ID Verification"]
   },
   hi: {
     title: "श्रमशील्ड एआई",
-    status: "24/7 उपलब्ध",
-    placeholder: "कवरेज या भुगतान के बारे में पूछें...",
-    footer: "एआई सत्यापित पैरामीट्रिक प्रणाली",
-    greeting: "नमस्ते! मैं श्रमशील्ड एआई असिस्टेंट हूँ। आप कवरेज के बारे में पूछ सकते हैं, या अपना पंजीकृत फोन नंबर देकर भुगतान/देरी की स्थिति की जांच कर सकते हैं।",
-    clarify: "क्षमा करें, मैं समझ नहीं पाया। क्या आप कवरेज या भुगतान के बारे में अपना प्रश्न स्पष्ट कर सकते हैं?",
-    payment_processed: "मैंने दिए गए नंबर के लिए सिस्टम की जांच की है। आपका भुगतान बारिश ट्रिगर के माध्यम से स्वचालित रूप से किया गया था, लेकिन UPI गेटवे कतार में लंबित है। यह अगले 2-4 घंटों के भीतर आपके खाते में दिखाई देगा। देरी के लिए हमें खेद है!",
-    payment_ask_number: "विलंबित भुगतान या लेनदेन की स्थिति की जांच करने के लिए, कृपया अपना पंजीकृत 10 अंकों का फोन नंबर टाइप करें ताकि मैं खाता बही में देख सकूं।",
-    how_it_works: "श्रमशील्ड उपग्रह और मौसम डेटा की निगरानी करके काम करता है। यदि आपके क्षेत्र में अत्यधिक मौसम होता है, तो हम स्वचालित रूप से आपके UPI ID पर भुगतान करते हैं!",
-    pricing: "हमारी योजनाएं फ्लेक्स लाइट के लिए ₹49/सप्ताह से शुरू होती हैं, और गिग प्रो कवरेज के लिए ₹99/सप्ताह तक जाती हैं।",
-    support: "यदि आपको सहायता की आवश्यकता है, तो आप help@shramshield.in पर ईमेल कर सकते हैं या 1800-SHRAM-HELP पर कॉल कर सकते हैं।",
-    hello: "नमस्ते! आज मैं आपकी श्रमशील्ड सुरक्षा में कैसे सहायता कर सकता हूँ?"
+    status: "एआई सहायक",
+    greeting: ["नमस्ते! मैं श्रमशील्ड एआई सहायक हूँ। आज आपकी कमाई सुरक्षित करने में मैं आपकी कैसे मदद कर सकता हूँ?", "नमस्ते! आपकी साप्ताहिक कवरेज और भुगतान के बारे में मदद के लिए मैं यहाँ हूँ।"],
+    payout_status: {
+      ask_number: "अपने भुगतान की स्थिति जांचने के लिए, कृपया अपना 10 अंकों का पंजीकृत फोन नंबर प्रदान करें।",
+      success: "मैंने लेज़र की जाँच की है। आपका भुगतान वर्षा सेंसर द्वारा शुरू किया गया था और वर्तमान में UPI प्रोसेसिंग कतार में है। आपको यह 2-4 घंटों में मिल जाना चाहिए!",
+      not_found: "मुझे उस नंबर के लिए कोई सक्रिय ट्रिगर नहीं मिला। कृपया सुनिश्चित करें कि आपकी योजना सक्रिय है।"
+    },
+    how_it_works: "श्रमशील्ड वास्तविक समय के मौसम सेंसर का उपयोग करता है। यदि आपके क्षेत्र में 30mm से अधिक बारिश होती है, तो हम तुरंत भुगतान भेजते हैं!",
+    pricing: "हमारी योजनाएं गतिशील हैं! फ्लेक्स लाइट ₹49/सप्ताह (₹1,500 भुगतान) से शुरू होती है और गिग प्रो ₹99/सप्ताह (₹2,500 भुगतान) है।",
+    vision_ai: "अपनी आईडी सत्यापित करने के लिए ऑनबोर्डिंग पेज पर जाएं। हमारा विजन एआई आपके दस्तावेज़ को स्वचालित रूप से स्कैन करेगा।",
+    safety: "आपकी सुरक्षा हमारी प्राथमिकता है। यदि एक्यूआई 400 से ऊपर है, तो रिस्क रडार आपको सचेत करेगा। सुरक्षित रहें, हम आय के नुकसान की भरपाई करेंगे।",
+    clarify: "मैं अभी सीख रहा हूँ! क्या आप भुगतान, मूल्य निर्धारण या मौसम ट्रिगर के बारे में पूछ सकते हैं?",
+    quick_replies: ["💰 भुगतान की स्थिति", "🌧️ यह कैसे काम करता है?", "📉 कीमतों की जांच", "🛡️ आईडी सहायता"]
   },
   ta: {
     title: "ஷிரம்ஷீல்டு AI",
-    status: "24/7 கிடைக்கும்",
-    placeholder: "கவரேஜ் அல்லது பணம் செலுத்தல்கள் பற்றி கேளுங்கள்...",
-    footer: "AI சரிபார்க்கப்பட்ட பாராமெட்ரிக் அமைப்பு",
-    greeting: "வணக்கம்! நான் ஷிரம்ஷீல்டு AI உதவியாளர். நீங்கள் கவரேஜ் பற்றி பொதுவான கேள்விகளைக் கேட்கலாம், அல்லது உங்கள் பதிவு செய்யப்பட்ட தொலைபேசி எண்ணை வழங்கி உங்கள் கட்டணம்/தாமத நிலையைச் சரிபார்க்கலாம்.",
-    clarify: "மன்னிக்கவும், எனக்கு புரியவில்லை. கவரேஜ் அல்லது பணம் செலுத்துதல் பற்றிய உங்கள் கேள்வியை தெளிவுபடுத்த முடியுமா?",
-    payment_processed: "வழங்கப்பட்ட எண்ணிற்கான கணினியை நான் சரிபார்த்தேன். உங்கள் கட்டணம் மழையின் தூண்டுதல் மூலம் தானாகவே செயலாக்கப்பட்டது, ஆனால் தற்போது UPI கேட்வே வரிசையில் நிலுவையில் உள்ளது. இது அடுத்த 2-4 மணி நேரத்திற்குள் உங்கள் கணக்கில் பிரதிபலிக்கும். தாமதத்திற்கு வருந்துகிறோம்!",
-    payment_ask_number: "தாமதமான கட்டணம் அல்லது குறிப்பிட்ட பரிவர்த்தனை நிலையைச் சரிபார்க்க, உங்கள் பதிவு செய்யப்பட்ட 10 இலக்க தொலைபேசி எண்ணை தட்டச்சு செய்யவும்.",
-    how_it_works: "ஷிரம்ஷீல்டு நேரடி செயற்கைக்கோள் மற்றும் வானிலை தரவுகளை கண்காணிப்பதன் மூலம் செயல்படுகிறது. உங்கள் மண்டலத்தில் மோசமான வானிலை ஏற்பட்டால், உங்கள் UPI ஐடிக்கு தானாகவே பணம் செலுத்துவோம்!",
-    pricing: "எங்கள் திட்டங்கள் Flex Lite பாதுகாப்பிற்காக வாரத்திற்கு ₹49 இல் தொடங்குகின்றன, Gig Pro கவரேஜுக்கு வாரத்திற்கு ₹99 வரை செல்கின்றன.",
-    support: "உங்களுக்கு மனித உதவி தேவைப்பட்டால், நீங்கள் help@shramshield.in இல் எங்களுக்கு மின்னஞ்சல் அனுப்பலாம் அல்லது எங்களின் 24/7 ஹாட்லைனை 1800-SHRAM-HELP இல் அழைக்கலாம்.",
-    hello: "வணக்கம்! இன்று உங்கள் ஷிரம்ஷீல்டு பாதுகாப்பிற்கு நான் எவ்வாறு உதவ முடியும்?"
+    status: "24/7 உதவி",
+    greeting: ["வணக்கம்! நான் ஷிரம்ஷீல்டு AI உதவியாளர். உங்கள் வருமானத்தைப் பாதுகாக்க நான் இன்று உங்களுக்கு எப்படி உதவ முடியும்?", "வணக்கம்! உங்கள் வாராந்திர கவரேஜ் மற்றும் பணம் செலுத்துதலில் உதவ நான் இங்கே இருக்கிறேன்."],
+    payout_status: {
+      ask_number: "உங்கள் பணம் செலுத்தும் நிலையைச் சரிபார்க்க, உங்கள் 10 இலக்க பதிவு செய்யப்பட்ட தொலைபேசி எண்ணை வழங்கவும்.",
+      success: "நான் லெட்ஜரைச் சரிபார்த்தேன். உங்கள் கட்டணம் மழைக்கால சென்சார்களால் தூண்டப்பட்டது, தற்போது UPI வரிசையில் உள்ளது. 2-4 மணி நேரத்திற்குள் உங்கள் கணக்கிற்கு வரும்!",
+      not_found: "அந்த எண்ணிற்கான செயலில் உள்ள ட்ரிக்கர் எதையும் என்னால் கண்டுபிடிக்க முடியவில்லை."
+    },
+    how_it_works: "ஷிரம்ஷீல்டு நிகழ்நேர வானிலை சென்சார்களைப் பயன்படுத்துகிறது. உங்கள் மண்டலத்தில் 30 மிமீக்கு மேல் மழை பெய்தால், நாங்கள் உடனடியாக பணம் செலுத்துவோம்!",
+    pricing: "எங்கள் திட்டங்கள் Flex Lite வாரத்திற்கு ₹49 (₹1,500 payout) மற்றும் Gig Pro வாரத்திற்கு ₹99 (₹2,500 payout) ஆகும்.",
+    vision_ai: "உங்கள் ஐடியைச் சரிபார்க்க, ஆன்போர்டிங் பக்கத்திற்குச் செல்லவும். எங்கள் விஷன் AI உங்கள் ஆவணத்தை தானாகவே ஸேன் செய்யும்.",
+    safety: "உங்கள் பாதுகாப்பு முன்னுரிமை. AQI 400க்கு மேல் இருந்தால், ரிஸ்க் ரேடார் உங்களை எச்சரிக்கும். பாதுகாப்பாக இருங்கள்.",
+    clarify: "நான் இன்னும் கற்றுக்கொண்டிருக்கிறேன்! பணம் செலுத்துதல் அல்லது வானிலை பற்றி கேட்க முடியுமா?",
+    quick_replies: ["💰 நிலையைச் சரிபார்க்க", "🌧️ இது எப்படி வேலை செய்கிறது?", "📉 விலையைச் சரிபார்க்க", "🛡️ ஐடி உதவி"]
   }
 };
 
@@ -87,10 +95,9 @@ export default function ChatBot() {
   const [language, setLanguage] = useState<Language>("hinglish"); 
   const [showLangMenu, setShowLangMenu] = useState(false);
 
-  // Hide chatbot on pages where it's not needed
-  if (HIDDEN_ROUTES.includes(pathname)) return null;
+  // State
   const [messages, setMessages] = useState<Message[]>([
-    { id: "1", role: "bot", text: TRANSLATIONS["hinglish"].greeting }
+    { id: "1", role: "bot", text: INTENTS["hinglish"].greeting[0] }
   ]);
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -104,63 +111,69 @@ export default function ChatBot() {
     scrollToBottom();
   }, [messages, isTyping]);
 
+  if (HIDDEN_ROUTES.includes(pathname)) return null;
+
+  const generateResponse = (input: string, lang: Language) => {
+    const lower = input.toLowerCase();
+    const data = INTENTS[lang];
+
+    // Payout / Number check
+    if (lower.match(/\d{10}/)) return data.payout_status.success;
+    if (lower.includes("payment") || lower.includes("payout") || lower.includes("status") || lower.includes("paisa") || lower.includes("ruka") || lower.includes("kab aayega") || lower.includes("kattanam")) {
+      return data.payout_status.ask_number;
+    }
+
+    // How it works
+    if (lower.includes("how") || lower.includes("work") || lower.includes("kaise") || lower.includes("eppadi") || lower.includes("kya hai")) {
+      return data.how_it_works;
+    }
+
+    // Pricing
+    if (lower.includes("price") || lower.includes("cost") || lower.includes("premium") || lower.includes("daam") || lower.includes("kitna") || lower.includes("plan") || lower.includes("vilai")) {
+      return data.pricing;
+    }
+
+    // Vision AI / ID
+    if (lower.includes("id") || lower.includes("verify") || lower.includes("document") || lower.includes("aadhar") || lower.includes("scan") || lower.includes("verification")) {
+      return data.vision_ai;
+    }
+
+    // Safety / AQI
+    if (lower.includes("safe") || lower.includes("rain") || lower.includes("aqi") || lower.includes("weather") || lower.includes("danger") || lower.includes("suraksha")) {
+      return data.safety;
+    }
+
+    // Greetings
+    if (lower.includes("hi") || lower.includes("hello") || lower.includes("namaste") || lower.includes("hey") || lower.includes("vanakkam")) {
+      return data.greeting[Math.floor(Math.random() * data.greeting.length)];
+    }
+
+    return data.clarify;
+  };
+
   const handleLanguageSelect = (newLang: Language) => {
     setLanguage(newLang);
     setShowLangMenu(false);
-    // Add translation notice
     setMessages(prev => [
       ...prev, 
-      { id: Date.now().toString(), role: "bot", text: TRANSLATIONS[newLang].greeting }
+      { id: Date.now().toString(), role: "bot", text: INTENTS[newLang].greeting[0] }
     ]);
   };
 
-  const handleSendMessage = () => {
-    if (!inputMessage.trim()) return;
+  const handleSendMessage = (textOverride?: string) => {
+    const text = textOverride || inputMessage;
+    if (!text.trim()) return;
 
-    const newUserMsg: Message = { id: Date.now().toString(), role: "user", text: inputMessage.trim() };
+    const newUserMsg: Message = { id: Date.now().toString(), role: "user", text: text.trim() };
     setMessages(prev => [...prev, newUserMsg]);
     setInputMessage("");
     setIsTyping(true);
 
-    // AI Response Logic Simulation
     setTimeout(() => {
-      let botResponse = TRANSLATIONS[language].clarify;
-      const lowerInput = newUserMsg.text.toLowerCase();
-
-      if (
-        lowerInput.includes("payment") || lowerInput.includes("status") || lowerInput.includes("delay") ||
-        lowerInput.includes("bhugtan") || lowerInput.includes("paisa") || lowerInput.includes("ruka") ||
-        lowerInput.includes("kattanam") || lowerInput.includes("nilai") || lowerInput.includes("kab aayega")
-      ) {
-         if (lowerInput.match(/\d{10}/)) {
-           botResponse = TRANSLATIONS[language].payment_processed;
-         } else {
-           botResponse = TRANSLATIONS[language].payment_ask_number;
-         }
-      } else if (
-        (lowerInput.includes("how") && lowerInput.includes("work")) || 
-        lowerInput.includes("kaise") || lowerInput.includes("eppadi") || lowerInput.includes("kya hai")
-      ) {
-         botResponse = TRANSLATIONS[language].how_it_works;
-      } else if (
-        lowerInput.includes("price") || lowerInput.includes("cost") || lowerInput.includes("premium") || 
-        lowerInput.includes("daam") || lowerInput.includes("kitna") || lowerInput.includes("vilai") || lowerInput.includes("plan")
-      ) {
-         botResponse = TRANSLATIONS[language].pricing;
-      } else if (
-        lowerInput.includes("help") || lowerInput.includes("human") || lowerInput.includes("support") || 
-        lowerInput.includes("madad") || lowerInput.includes("udhavi") || lowerInput.includes("baat")
-      ) {
-         botResponse = TRANSLATIONS[language].support;
-      } else if (
-        lowerInput.includes("hello") || lowerInput.includes("hi") || lowerInput.includes("namaste") || lowerInput.includes("vanakkam")
-      ) {
-         botResponse = TRANSLATIONS[language].hello;
-      }
-
-      setMessages(prev => [...prev, { id: Date.now().toString(), role: "bot", text: botResponse }]);
+      const response = generateResponse(text, language);
+      setMessages(prev => [...prev, { id: Date.now().toString(), role: "bot", text: response }]);
       setIsTyping(false);
-    }, 1500);
+    }, 1000 + Math.random() * 800);
   };
 
   return (
@@ -173,18 +186,16 @@ export default function ChatBot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="w-screen sm:w-[380px] h-[100dvh] sm:h-[500px] bg-white sm:rounded-2xl shadow-xl border border-slate-200 flex flex-col sm:mb-4 overflow-hidden font-sans relative"
+            className="w-screen sm:w-[400px] h-[100dvh] sm:h-[550px] bg-white sm:rounded-2xl shadow-2xl border border-slate-200 flex flex-col sm:mb-4 overflow-hidden font-sans relative"
           >
             {/* Custom Language Dropdown Menu */}
             <AnimatePresence>
               {showLangMenu && (
                 <>
-                  {/* Backdrop */}
                   <div 
                     className="absolute inset-0 z-40 bg-slate-900/10"
                     onClick={() => setShowLangMenu(false)}
                   />
-                  {/* Dropdown Card */}
                   <motion.div 
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -196,7 +207,7 @@ export default function ChatBot() {
                        <button
                          key={opt.value}
                          onClick={() => handleLanguageSelect(opt.value)}
-                         className={`w-full text-left px-4 py-2.5 text-xs font-semibold transition-colors ${language === opt.value ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                         className={`w-full text-left px-4 py-2.5 text-xs font-bold transition-colors ${language === opt.value ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                        >
                          {opt.label}
                        </button>
@@ -207,25 +218,24 @@ export default function ChatBot() {
             </AnimatePresence>
 
             {/* Header */}
-            <div className="bg-slate-900 px-4 sm:px-5 py-3 sm:py-4 flex items-center justify-between shrink-0 relative z-30">
-               <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
-                    <Bot className="w-4 h-4 text-white" />
+            <div className="bg-slate-900 px-5 py-4 flex items-center justify-between shrink-0 relative z-30 shadow-lg">
+               <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center shrink-0 shadow-inner">
+                    <Bot className="w-5 h-5 text-white" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-white font-semibold text-sm leading-tight truncate">{TRANSLATIONS[language].title}</h3>
-                    <p className="text-blue-300 text-[10px] font-medium uppercase tracking-widest">{TRANSLATIONS[language].status}</p>
+                    <h3 className="text-white font-bold text-sm leading-tight truncate">{INTENTS[language].title}</h3>
+                    <p className="text-blue-400 text-[9px] font-black uppercase tracking-widest leading-none mt-1.5 font-sans italic">{INTENTS[language].status}</p>
                   </div>
                </div>
                
                <div className="flex items-center gap-2 shrink-0">
-                  {/* Custom Language Button */}
                   <button 
                     onClick={() => setShowLangMenu(!showLangMenu)}
-                    className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 transition-colors rounded-lg px-2 sm:px-2.5 py-1.5 border border-slate-700"
+                    className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 transition-colors rounded-lg px-2 py-1.5 border border-slate-700"
                   >
                     <Globe className="w-3.5 h-3.5 text-slate-300" />
-                    <span className="hidden sm:inline text-[11px] font-semibold text-white tracking-widest uppercase">
+                    <span className="hidden sm:inline text-[10px] font-bold text-white tracking-widest uppercase">
                        {LANG_OPTIONS.find(l => l.value === language)?.label}
                     </span>
                     <ChevronDown className="w-3 h-3 text-slate-400" />
@@ -238,32 +248,47 @@ export default function ChatBot() {
             </div>
 
             {/* Chat Area */}
-            <div className="flex-grow p-5 space-y-4 overflow-y-auto bg-slate-50 relative z-20">
+            <div className="flex-grow p-4 space-y-4 overflow-y-auto bg-slate-50 relative z-20">
               {messages.map((msg) => (
-                <div key={msg.id} className={`flex items-start gap-3 w-full ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                  <div className={`w-7 h-7 rounded-full shrink-0 flex items-center justify-center ${msg.role === "user" ? "bg-slate-200" : "bg-blue-100"}`}>
-                    {msg.role === "user" ? <User className="w-3.5 h-3.5 text-slate-600" /> : <Bot className="w-3.5 h-3.5 text-blue-600" />}
+                <div key={msg.id} className={`flex items-start gap-2.5 w-full ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                  <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center shadow-sm ${msg.role === "user" ? "bg-slate-200" : "bg-blue-600"}`}>
+                    {msg.role === "user" ? <User className="w-4 h-4 text-slate-600" /> : <Bot className="w-4 h-4 text-white" />}
                   </div>
-                  <div className={`p-3 rounded-2xl text-sm font-medium leading-relaxed max-w-[80%] ${msg.role === "user" ? "bg-blue-600 text-white rounded-tr-sm" : "bg-white border border-slate-200 text-slate-700 rounded-tl-sm shadow-sm"}`}>
+                  <div className={`p-3.5 rounded-2xl text-[13px] font-medium leading-relaxed max-w-[85%] shadow-sm ${msg.role === "user" ? "bg-blue-600 text-white rounded-tr-none" : "bg-white border border-slate-200 text-slate-700 rounded-tl-none"}`}>
                      {msg.text}
                   </div>
                 </div>
               ))}
               
               {isTyping && (
-                <div className="flex items-start gap-3 w-full flex-row">
-                  <div className="w-7 h-7 rounded-full shrink-0 bg-blue-100 flex items-center justify-center">
-                    <Bot className="w-3.5 h-3.5 text-blue-600" />
+                <div className="flex items-start gap-2.5 w-full flex-row">
+                  <div className="w-8 h-8 rounded-full shrink-0 bg-blue-600 flex items-center justify-center shadow-sm">
+                    <Bot className="w-4 h-4 text-white" />
                   </div>
-                  <div className="p-3 bg-white border border-slate-200 rounded-2xl rounded-tl-sm shadow-sm flex items-center gap-1.5 h-[42px]">
-                     <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                     <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                     <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                  <div className="p-3 bg-white border border-slate-200 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-1.5 h-[42px]">
+                     <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                     <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                     <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                   </div>
                 </div>
               )}
               <div ref={messagesEndRef} />
             </div>
+
+            {/* Quick Action Chips */}
+            {!isTyping && (
+              <div className="px-4 py-2 bg-slate-50 border-t border-slate-100 flex gap-2 overflow-x-auto no-scrollbar shrink-0">
+                {INTENTS[language].quick_replies.map((reply) => (
+                  <button
+                    key={reply}
+                    onClick={() => handleSendMessage(reply)}
+                    className="whitespace-nowrap px-3 py-1.5 bg-white border border-slate-200 rounded-full text-[11px] font-bold text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm active:scale-95"
+                  >
+                    {reply}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Input Form */}
             <div className="p-4 bg-white border-t border-slate-200 shrink-0 relative z-20">
@@ -275,20 +300,20 @@ export default function ChatBot() {
                    type="text" 
                    value={inputMessage}
                    onChange={(e) => setInputMessage(e.target.value)}
-                   placeholder={TRANSLATIONS[language].placeholder}
-                   className="flex-grow bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-slate-800"
+                   placeholder={language === 'en' ? "Type your query here..." : "Yahan puchein..."}
+                   className="flex-grow bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all text-slate-800"
                  />
                  <button 
                     type="submit"
                     disabled={!inputMessage.trim()}
-                    className="p-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-500 disabled:opacity-50 disabled:bg-slate-400 transition-colors shrink-0"
+                    className="w-11 h-11 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:bg-slate-400 shadow-md shadow-blue-500/20 flex items-center justify-center transition-all active:scale-95"
                  >
-                    <Send className="w-4 h-4 ml-0.5" />
+                    <Send className="w-4 h-4" />
                  </button>
                </form>
                <div className="text-center mt-3">
-                 <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">
-                   {TRANSLATIONS[language].footer}
+                 <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+                   SECURE PARAMETRIC ASSISTANT
                  </p>
                </div>
             </div>
@@ -302,7 +327,7 @@ export default function ChatBot() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsOpen(true)}
-          className="w-14 h-14 bg-slate-900 border border-slate-800 text-white rounded-full flex items-center justify-center shadow-lg shadow-slate-900/20 z-50 transition-colors hover:bg-slate-800 m-4 sm:m-0"
+          className="w-14 h-14 bg-slate-900 border border-slate-800 text-white rounded-full flex items-center justify-center shadow-lg shadow-slate-900/40 z-50 transition-colors hover:bg-slate-800 m-4 sm:m-0"
         >
           <MessageSquare className="w-6 h-6" />
         </motion.button>

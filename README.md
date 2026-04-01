@@ -44,7 +44,7 @@ This ensures **scalable adoption across diverse worker segments.**
 
 ## 2. The Weekly Premium Model
 Gig workers operate on a week-to-week earning cycle. ShramShield aligns with this reality by structuring all policies on a **Weekly basis**.
-- **Base Premium**: A low-cost entry fee (e.g., ₹20/week).
+- **Base Premium**: A low-cost entry fee (e.g., ₹49/week).
 - **AI-Dynamic Adjustment**: Our risk model adjusts the premium based on the upcoming week's hyper-local weather forecast and historical disruption data for the user’s specific zone.
 
 ## Base Premium Threshold (Example)
