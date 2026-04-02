@@ -38,6 +38,7 @@ __pycache__/
 
 # Virtual Environments
 .venv/
+.venv_new/
 venv/
 env/
 ENV/
@@ -46,6 +47,11 @@ ENV/
 *.sqlite3
 *.db
 shramshield.db
+
+# Logs & Debug
+backend_error*.txt
+backend_aos_error*.txt
+*.log
 
 # Testing / Tooling
 .pytest_cache/

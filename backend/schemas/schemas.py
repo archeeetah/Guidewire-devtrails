@@ -67,3 +67,12 @@ class PayoutResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class AOLRequest(BaseModel):
+    query: str
+    session_id: str
+
+class AOLResponse(BaseModel):
+    text: str
+    trace: list[dict]
+    status: str = "SUCCESS"

@@ -8,6 +8,10 @@ from models.policy import Policy
 from models.payout import Payout
 from models.telemetry_log import TelemetryScanLog
 from models.telemetry_data import TelemetryData
+from models.audit_log import AOLAuditLog
+from schemas.schemas import AOLRequest, AOLResponse
+from services.agent.agent_orchestrator import orchestrator
+from services.agent.audit_trail import AOLAuditTrail
 from api.routes import policies, triggers, users, payouts, admin, monitoring, telemetry
 
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -71,6 +75,38 @@ app.include_router(payouts.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
 app.include_router(monitoring.router, prefix="/api")
 app.include_router(telemetry.router, prefix="/api")
+
+@app.post("/api/agent/interact", response_model=AOLResponse)
+async def agent_interact(req: AOLRequest):
+    """
+    ShramShield AOL: The Agentic Gateway.
+    Processes user queries through the Gemini-powered Reasoning Loop.
+    Logs every action for the investor-grade audit trail.
+    """
+    try:
+        # Process query through the Orchestrator
+        result = orchestrator.interact(req.query)
+        
+        # Log to the Audit Trail for investors
+        AOLAuditTrail.log_interaction(
+            session_id=req.session_id,
+            user_input=req.query,
+            response=result["text"],
+            tool_calls=result["trace"]
+        )
+        
+        return AOLResponse(
+            text=result["text"],
+            trace=result["trace"],
+            status="SUCCESS"
+        )
+    except Exception as e:
+        logger.error(f"AOL Error: {str(e)}")
+        return AOLResponse(
+            text="I'm sorry, I'm having trouble reasoning right now. Please try again or check your connection.",
+            trace=[],
+            status="ERROR"
+        )
 
 
 @app.get("/")
