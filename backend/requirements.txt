@@ -6,3 +6,6 @@ slowapi>=0.1.9
 httpx-cache>=0.1.2
 apscheduler>=3.10.0
 google-generativeai>=0.4.0
+psycopg2-binary>=2.9.9
+uvicorn>=0.30.0
+gunicorn>=21.2.0

@@ -3,6 +3,7 @@ const nextConfig = {
   // Bypassing Turbopack/PWA Worker Errors manually
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
+  output: 'standalone',
 
   // Vercel Production Fast API proxy mapping
   async rewrites() {

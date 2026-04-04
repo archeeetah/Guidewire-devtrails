@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+.env
+.pytest_cache/
+.coverage
+htmlcov/
+shramshield.db
+backend_error.txt
+backend_aos_error.txt
+backend_aos_error_v2.txt
+backend_error_final.txt
+.git/
+.gitignore
